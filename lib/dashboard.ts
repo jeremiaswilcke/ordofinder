@@ -1,4 +1,4 @@
-import { getCurrentProfile } from "@/lib/auth";
+import { getCurrentProfile, type UserRole } from "@/lib/auth";
 import { churches } from "@/lib/demo-data";
 import { hasSupabaseEnv } from "@/lib/env";
 import { listInvitesForCurrentUser, type InviteListItem } from "@/lib/invites";
@@ -21,7 +21,7 @@ export type ReviewerDashboardData = {
   myRatings: number;
   inviteTreeCount: number;
   recentInvites: InviteListItem[];
-  role: "reviewer" | "regional_admin" | "global_admin" | null;
+  role: UserRole | null;
 };
 
 export type AdminDashboardData = {
@@ -82,7 +82,7 @@ export async function getReviewerDashboardData(): Promise<ReviewerDashboardData>
     };
   }
 
-  if (!["reviewer", "regional_admin", "global_admin"].includes(profile.role)) {
+  if (!["reviewer", "senior_reviewer", "regional_admin", "global_admin"].includes(profile.role)) {
     return {
       queue: [],
       myRegions: [],

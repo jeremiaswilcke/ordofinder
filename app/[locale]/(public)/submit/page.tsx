@@ -1,5 +1,8 @@
+import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { SubmissionForm } from "@/components/forms/SubmissionForm";
+import { getCurrentProfile, isReviewerOrHigher } from "@/lib/auth";
+import { hasSupabaseEnv } from "@/lib/env";
 
 export default async function SubmitPage({
   params
@@ -8,6 +11,17 @@ export default async function SubmitPage({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "submit" });
+
+  // Login + Rolle nur erzwingen, wenn Supabase eingerichtet ist. Im
+  // Demo-Modus laesst sich das Formular weiter ohne Login ausprobieren.
+  if (hasSupabaseEnv()) {
+    const profile = await getCurrentProfile();
+    if (!profile) redirect(`/${locale}/login`);
+    if (!profile.role) redirect(`/${locale}/apply`);
+    if (!isReviewerOrHigher(profile.role)) {
+      redirect(`/${locale}`);
+    }
+  }
 
   return (
     <div className="space-y-10">

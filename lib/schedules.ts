@@ -36,10 +36,14 @@ export async function getChurchScheduleBySlug(
 ): Promise<ChurchScheduleContext | null> {
   if (!hasSupabaseEnv()) return null;
   const supabase = createAdminSupabaseClient();
+  // Wichtig: nur approved Kirchen herausgeben. Der Admin-Client bypasst RLS,
+  // deshalb muss der Filter explizit sein, sonst leaken pending/rejected
+  // Kirchen ueber einen erratenen Slug.
   const { data: church } = await supabase
     .from("churches")
     .select("id,name,city,slug")
     .eq("slug", slug)
+    .eq("status", "approved")
     .maybeSingle();
   if (!church) return null;
 

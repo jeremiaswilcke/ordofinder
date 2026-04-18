@@ -32,6 +32,18 @@ export async function GET(request: Request) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  const safeNext = next.startsWith("/") ? next : "/";
+  // Nur lokale Pfade akzeptieren — schuetzt vor Open-Redirect:
+  //   /foo         -> ok
+  //   //evil.com   -> abgewiesen (resolved auf anderer Host)
+  //   /\evil.com   -> abgewiesen (Safari/WebKit casing)
+  //   javascript:  -> abgewiesen
+  //   http(s)://   -> abgewiesen
+  const isSafeNext =
+    typeof next === "string" &&
+    next.startsWith("/") &&
+    !next.startsWith("//") &&
+    !next.startsWith("/\\") &&
+    !/^\/+\s*[a-z][a-z0-9+.-]*:/i.test(next);
+  const safeNext = isSafeNext ? next : "/";
   return NextResponse.redirect(new URL(safeNext, url.origin));
 }

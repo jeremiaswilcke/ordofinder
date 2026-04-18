@@ -4,7 +4,9 @@ import { createInviteToken } from "@/lib/invites";
 
 const inviteSchema = z.object({
   email: z.string().email(),
-  role: z.enum(["reviewer", "regional_admin", "global_admin"]).default("reviewer"),
+  role: z
+    .enum(["reviewer", "senior_reviewer", "regional_admin", "global_admin"])
+    .default("reviewer"),
   countryCode: z.string().trim().min(2).max(2).optional(),
   subdivisionCode: z.string().trim().min(2).max(12).optional(),
   isGlobalScope: z.boolean().optional(),

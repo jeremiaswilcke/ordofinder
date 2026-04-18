@@ -5,7 +5,7 @@ import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 
 export type InvitePreview = {
   email: string;
-  role: "reviewer" | "regional_admin" | "global_admin";
+  role: "reviewer" | "senior_reviewer" | "regional_admin" | "global_admin";
   regionLabel: string;
   status: "valid" | "redeemed" | "expired" | "not_found";
   expiresAt?: string;
@@ -14,7 +14,7 @@ export type InvitePreview = {
 export type InviteListItem = {
   id: string;
   email: string;
-  role: "reviewer" | "regional_admin" | "global_admin";
+  role: "reviewer" | "senior_reviewer" | "regional_admin" | "global_admin";
   regionLabel: string;
   createdAt: string;
   expiresAt: string;
@@ -148,11 +148,21 @@ export async function createInviteToken(input: CreateInviteInput) {
     throw new Error("unauthorized");
   }
 
-  if (profile.role === "reviewer" && input.role !== "reviewer") {
+  // Gestaffelte Berechtigungen fuer Invites:
+  //   reviewer          -> darf nichts einladen
+  //   senior_reviewer   -> darf nur reviewer einladen
+  //   regional_admin    -> darf reviewer und senior_reviewer einladen
+  //   global_admin      -> darf jede Rolle einladen
+  if (profile.role === "reviewer") {
     throw new Error("forbidden_role");
   }
-
-  if (profile.role === "regional_admin" && input.role !== "reviewer") {
+  if (profile.role === "senior_reviewer" && input.role !== "reviewer") {
+    throw new Error("forbidden_role");
+  }
+  if (
+    profile.role === "regional_admin" &&
+    !["reviewer", "senior_reviewer"].includes(input.role)
+  ) {
     throw new Error("forbidden_role");
   }
 

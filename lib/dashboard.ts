@@ -1,6 +1,8 @@
+import { getCurrentProfile } from "@/lib/auth";
 import { churches } from "@/lib/demo-data";
 import { hasSupabaseEnv } from "@/lib/env";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { listInvitesForCurrentUser, type InviteListItem } from "@/lib/invites";
+import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 
 export type ReviewerQueueItem = {
   id: string;
@@ -18,6 +20,8 @@ export type ReviewerDashboardData = {
   myInvitesRemaining: number;
   myRatings: number;
   inviteTreeCount: number;
+  recentInvites: InviteListItem[];
+  role: "reviewer" | "regional_admin" | "global_admin" | null;
 };
 
 export type AdminDashboardData = {
@@ -26,6 +30,7 @@ export type AdminDashboardData = {
   regionalAdminCount: number;
   openReports: number;
   pendingInvites: number;
+  recentInvites: InviteListItem[];
 };
 
 const mockQueue: ReviewerQueueItem[] = [
@@ -57,24 +62,44 @@ export async function getReviewerDashboardData(): Promise<ReviewerDashboardData>
       myInvitesRemaining: 3,
       myRatings: 18,
       inviteTreeCount: 5,
+      recentInvites: await listInvitesForCurrentUser(),
+      role: "reviewer",
     };
   }
 
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const profile = await getCurrentProfile();
+  const supabase = createAdminSupabaseClient();
 
-  if (!user) {
-    return { queue: [], myRegions: [], myInvitesRemaining: 0, myRatings: 0, inviteTreeCount: 0 };
+  if (!profile || !profile.role) {
+    return {
+      queue: [],
+      myRegions: [],
+      myInvitesRemaining: 0,
+      myRatings: 0,
+      inviteTreeCount: 0,
+      recentInvites: [],
+      role: null,
+    };
   }
 
-  const [regionsResult, profileResult, ratingsResult, submissionsResult, invitesResult] = await Promise.all([
-    supabase.from("reviewer_regions").select("country_code,subdivision_code,is_global_scope").eq("user_id", user.id),
-    supabase.from("profiles").select("reviewer_invite_quota").eq("id", user.id).maybeSingle(),
-    supabase.from("ratings").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+  if (!["reviewer", "regional_admin", "global_admin"].includes(profile.role)) {
+    return {
+      queue: [],
+      myRegions: [],
+      myInvitesRemaining: 0,
+      myRatings: 0,
+      inviteTreeCount: 0,
+      recentInvites: [],
+      role: null,
+    };
+  }
+
+  const [regionsResult, ratingsResult, submissionsResult, invitesResult, recentInvites] = await Promise.all([
+    supabase.from("reviewer_regions").select("country_code,subdivision_code,is_global_scope").eq("user_id", profile.userId),
+    supabase.from("ratings").select("id", { count: "exact", head: true }).eq("user_id", profile.userId),
     supabase.from("church_submissions").select("id,church_name,city,country_code,status,created_at").order("created_at", { ascending: false }).limit(10),
-    supabase.from("invite_tokens").select("id", { count: "exact", head: true }).eq("invited_by", user.id),
+    supabase.from("invite_tokens").select("id", { count: "exact", head: true }).eq("invited_by", profile.userId),
+    listInvitesForCurrentUser(),
   ]);
 
   const myRegions = (regionsResult.data ?? []).map((region) =>
@@ -92,9 +117,11 @@ export async function getReviewerDashboardData(): Promise<ReviewerDashboardData>
       region: item.country_code,
     })),
     myRegions,
-    myInvitesRemaining: profileResult.data?.reviewer_invite_quota ?? 0,
+    myInvitesRemaining: profile.reviewerInviteQuota,
     myRatings: ratingsResult.count ?? 0,
     inviteTreeCount: invitesResult.count ?? 0,
+    recentInvites,
+    role: profile.role,
   };
 }
 
@@ -106,16 +133,30 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
       regionalAdminCount: 4,
       openReports: 3,
       pendingInvites: 7,
+      recentInvites: await listInvitesForCurrentUser(),
     };
   }
 
-  const supabase = await createServerSupabaseClient();
-  const [submissionsResult, reviewerCountResult, regionalAdminCountResult, reportsResult, invitesResult] = await Promise.all([
+  const profile = await getCurrentProfile();
+  if (!profile || !profile.role || !["regional_admin", "global_admin"].includes(profile.role)) {
+    return {
+      pendingSubmissions: [],
+      reviewerCount: 0,
+      regionalAdminCount: 0,
+      openReports: 0,
+      pendingInvites: 0,
+      recentInvites: [],
+    };
+  }
+
+  const supabase = createAdminSupabaseClient();
+  const [submissionsResult, reviewerCountResult, regionalAdminCountResult, reportsResult, invitesResult, recentInvites] = await Promise.all([
     supabase.from("church_submissions").select("id,church_name,city,country_code,status,created_at").order("created_at", { ascending: false }).limit(20),
     supabase.from("profiles").select("id", { count: "exact", head: true }).eq("role", "reviewer"),
     supabase.from("profiles").select("id", { count: "exact", head: true }).eq("role", "regional_admin"),
     supabase.from("reports").select("id", { count: "exact", head: true }),
     supabase.from("invite_tokens").select("id", { count: "exact", head: true }).is("redeemed_at", null),
+    listInvitesForCurrentUser(),
   ]);
 
   return {
@@ -132,6 +173,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     regionalAdminCount: regionalAdminCountResult.count ?? 0,
     openReports: reportsResult.count ?? 0,
     pendingInvites: invitesResult.count ?? 0,
+    recentInvites,
   };
 }
 

@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { getCurrentProfile } from "@/lib/auth";
 import { hasSupabaseEnv } from "@/lib/env";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
@@ -17,6 +18,11 @@ export async function signInWithEmail(formData: FormData) {
 
   if (error) {
     return;
+  }
+
+  const profile = await getCurrentProfile();
+  if (profile?.role === "global_admin") {
+    redirect("/en/admin");
   }
 
   redirect("/en/reviewer");

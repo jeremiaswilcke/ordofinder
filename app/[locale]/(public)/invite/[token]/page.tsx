@@ -1,3 +1,4 @@
+import { InviteRedeemForm } from "@/components/forms/InviteRedeemForm";
 import { getInvitePreview } from "@/lib/invites";
 
 export default async function InvitePage({
@@ -37,6 +38,7 @@ export default async function InvitePage({
         <p className="text-[10px] uppercase tracking-[0.2em] text-outline">Raw token</p>
         <p className="mt-2 break-all">{token}</p>
       </div>
+      {invite.status === "valid" ? <InviteRedeemForm token={token} /> : null}
     </section>
   );
 }

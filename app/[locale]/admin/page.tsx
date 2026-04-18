@@ -1,3 +1,6 @@
+import { redirect } from "next/navigation";
+import { InviteCreateForm } from "@/components/forms/InviteCreateForm";
+import { getCurrentProfile } from "@/lib/auth";
 import { getAdminDashboardData } from "@/lib/dashboard";
 
 function formatDate(value: string) {
@@ -7,7 +10,17 @@ function formatDate(value: string) {
   }).format(new Date(value));
 }
 
-export default async function AdminPage() {
+export default async function AdminPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const profile = await getCurrentProfile();
+  if (!profile?.role || !["regional_admin", "global_admin"].includes(profile.role)) {
+    redirect(`/${locale}/login`);
+  }
+
   const data = await getAdminDashboardData();
 
   return (
@@ -68,6 +81,37 @@ export default async function AdminPage() {
             Invite tokens remain region-sensitive and should be audited before expanding reviewer pools.
           </p>
         </aside>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
+        <section className="rounded-lg bg-surface-container-low p-6">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-outline">Recent Invites</p>
+          <div className="mt-4 space-y-3">
+            {data.recentInvites.length ? data.recentInvites.map((invite) => (
+              <article key={invite.id} className="rounded-lg bg-surface-container-lowest p-5 shadow-archival">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h2 className="font-medium text-on-surface">{invite.email}</h2>
+                    <p className="mt-1 text-sm text-on-surface-variant">
+                      {invite.regionLabel} · {invite.role.replaceAll("_", " ")}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-outline">
+                      {invite.redeemedAt ? "Redeemed" : "Pending"}
+                    </p>
+                    <p className="mt-2 text-sm text-on-surface-variant">{formatDate(invite.createdAt)}</p>
+                  </div>
+                </div>
+              </article>
+            )) : (
+              <div className="rounded-lg bg-surface-container-lowest p-5 text-sm text-on-surface-variant shadow-archival">
+                No recent invites yet.
+              </div>
+            )}
+          </div>
+        </section>
+        <InviteCreateForm canSetRole />
       </div>
     </div>
   );

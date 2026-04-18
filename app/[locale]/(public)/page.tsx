@@ -3,7 +3,7 @@ import { BentoGrid } from "@/components/layout/BentoGrid";
 import { ChurchCard } from "@/components/church/ChurchCard";
 import { CityCard } from "@/components/city/CityCard";
 import { Button } from "@/components/ui/Button";
-import { cities, getChurchBySlug } from "@/lib/demo-data";
+import { findChurch, listCities } from "@/lib/archive";
 
 export default async function LandingPage({
   params
@@ -12,7 +12,8 @@ export default async function LandingPage({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "landing" });
-  const featuredChurch = getChurchBySlug(cities[0].featuredChurchSlug);
+  const cities = await listCities();
+  const featuredChurch = cities[0] ? await findChurch(cities[0].featuredChurchSlug) : undefined;
 
   return (
     <div className="space-y-8">

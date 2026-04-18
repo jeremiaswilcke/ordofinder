@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { BentoGrid } from "@/components/layout/BentoGrid";
 import { ChurchCard } from "@/components/church/ChurchCard";
-import { getChurchesByCity, getCityBySlug } from "@/lib/demo-data";
+import { findCity, listChurchesByCity } from "@/lib/archive";
 
 export default async function CityDetailPage({
   params
@@ -9,9 +9,9 @@ export default async function CityDetailPage({
   params: Promise<{ locale: string; slug: string }>;
 }) {
   const { locale, slug } = await params;
-  const city = getCityBySlug(slug);
+  const city = await findCity(slug);
   if (!city) notFound();
-  const cityChurches = getChurchesByCity(slug);
+  const cityChurches = await listChurchesByCity(slug);
 
   return (
     <div className="space-y-8">

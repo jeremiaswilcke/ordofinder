@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { ChurchHeroCard } from "@/components/church/ChurchHeroCard";
 import { ChurchMetrics } from "@/components/church/ChurchMetrics";
 import { SchedulePanel } from "@/components/church/SchedulePanel";
-import { getChurchBySlug } from "@/lib/demo-data";
+import { findChurch } from "@/lib/archive";
 
 export default async function ChurchDetailPage({
   params
@@ -10,7 +10,7 @@ export default async function ChurchDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const church = getChurchBySlug(slug);
+  const church = await findChurch(slug);
   if (!church) notFound();
 
   return (

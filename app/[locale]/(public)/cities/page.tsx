@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { BentoGrid } from "@/components/layout/BentoGrid";
 import { CityCard } from "@/components/city/CityCard";
 import { Icon } from "@/components/ui/Icon";
-import { cities } from "@/lib/demo-data";
+import { listCities } from "@/lib/archive";
 
 export default async function CitiesPage({
   params
@@ -11,6 +11,7 @@ export default async function CitiesPage({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "cities" });
+  const cities = await listCities();
 
   return (
     <div className="space-y-6">

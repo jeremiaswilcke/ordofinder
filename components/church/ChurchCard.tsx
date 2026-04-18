@@ -37,9 +37,11 @@ export function ChurchCard({
             />
           ) : null}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent" />
-          <div className="absolute left-4 top-4">
-            <Chip overlay>{computeNextCelebration(nextMass.startTime)}</Chip>
-          </div>
+          {nextMass ? (
+            <div className="absolute left-4 top-4">
+              <Chip overlay>{computeNextCelebration(nextMass.startTime)}</Chip>
+            </div>
+          ) : null}
           {isFeature ? (
             <div className="absolute right-4 top-4 rounded bg-black/20 px-4 py-3 text-right text-white backdrop-blur-sm">
               <p className="text-[10px] uppercase tracking-[0.2em] text-white/65">Overall</p>

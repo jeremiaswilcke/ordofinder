@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { BentoGrid } from "@/components/layout/BentoGrid";
 import { ChurchCard } from "@/components/church/ChurchCard";
+import { UpcomingMasses } from "@/components/city/UpcomingMasses";
 import { findCity, listChurchesByCity } from "@/lib/archive";
 
 export default async function CityDetailPage({
@@ -20,6 +21,9 @@ export default async function CityDetailPage({
         <h1 className="mt-4 font-headline text-5xl font-bold text-primary md:text-7xl">{city.city}</h1>
         <p className="mt-4 max-w-3xl text-lg leading-relaxed text-on-surface-variant">{city.subtitle}</p>
       </section>
+
+      <UpcomingMasses churches={cityChurches} locale={locale} />
+
       <BentoGrid>
         {cityChurches.map((church) => (
           <ChurchCard key={church.slug} church={church} locale={locale} />

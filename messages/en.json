@@ -40,5 +40,16 @@
   "submit": {
     "title": "Submit a Church",
     "subtitle": "Help expand the archive with trustworthy, precise, charitable submissions."
+  },
+  "masses": {
+    "eyebrow": "Up next",
+    "heading": "Upcoming Masses",
+    "subtitle": "The next celebrations in this city, with time and distance from your location. Tap a row for the church archive.",
+    "empty": "No Mass times on record for the next two weeks.",
+    "loading": "Reading the schedule...",
+    "locationCta": "Use my location",
+    "locationPrompting": "Locating...",
+    "locationUser": "Distance from your location",
+    "locationFallback": "Distance from city centre"
   }
 }

@@ -40,5 +40,16 @@
   "submit": {
     "title": "Kirche einreichen",
     "subtitle": "Hilf mit, das Archiv durch verlaessliche, praezise und faire Einreichungen zu erweitern."
+  },
+  "masses": {
+    "eyebrow": "Als Naechstes",
+    "heading": "Naechste Messen",
+    "subtitle": "Die naechsten Feiern in dieser Stadt, mit Uhrzeit und Entfernung zu deinem Standort. Klick auf eine Zeile fuer das Kirchenprofil.",
+    "empty": "Keine Messzeiten fuer die naechsten zwei Wochen hinterlegt.",
+    "loading": "Zeitplan wird gelesen...",
+    "locationCta": "Standort verwenden",
+    "locationPrompting": "Standort wird bestimmt...",
+    "locationUser": "Entfernung ab deinem Standort",
+    "locationFallback": "Entfernung ab Stadtzentrum"
   }
 }

@@ -1,0 +1,31 @@
+{
+  "nav": {
+    "archive": "Ordofinder Archive",
+    "cities": "Cities",
+    "map": "Map",
+    "submit": "Submit",
+    "login": "Login",
+    "reviewer": "Reviewer",
+    "admin": "Admin"
+  },
+  "landing": {
+    "eyebrow": "Editorial Catholic Directory",
+    "title": "Find a Worthy Celebration",
+    "subtitle": "A city-first archive for Catholic churches, Mass times, liturgical character and the living pulse of parish life.",
+    "ctaPrimary": "Browse Cities",
+    "ctaSecondary": "Open Global Map",
+    "topCities": "Top Cities",
+    "detectedCity": "Current city context",
+    "featureTitle": "Trust-graph curation, not directory noise",
+    "featureBody": "Ordofinder pairs public discovery with reviewer-led verification, regional stewardship and archival presentation."
+  },
+  "cities": {
+    "title": "City Archive",
+    "subtitle": "Choose a city to open its churches, schedules and editorial notes.",
+    "searchPlaceholder": "Search city, country or archive..."
+  },
+  "submit": {
+    "title": "Submit a Church",
+    "subtitle": "Help expand the archive with trustworthy, precise, charitable submissions."
+  }
+}

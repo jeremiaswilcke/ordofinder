@@ -1,0 +1,31 @@
+{
+  "nav": {
+    "archive": "Ordofinder Archive",
+    "cities": "Staedte",
+    "map": "Karte",
+    "submit": "Einreichen",
+    "login": "Login",
+    "reviewer": "Reviewer",
+    "admin": "Admin"
+  },
+  "landing": {
+    "eyebrow": "Editoriales Kirchenarchiv",
+    "title": "Find a Worthy Celebration",
+    "subtitle": "Ein stadtzentriertes Archiv fuer katholische Kirchen, Messzeiten, liturgisches Profil und lebendige Gemeinschaft.",
+    "ctaPrimary": "Staedte durchsuchen",
+    "ctaSecondary": "Globale Karte oeffnen",
+    "topCities": "Top-Staedte",
+    "detectedCity": "Aktueller Stadtkontext",
+    "featureTitle": "Trust-Graph statt Verzeichnisrauschen",
+    "featureBody": "Ordofinder verbindet oeffentliche Entdeckung mit reviewer-gestuetzter Verifikation, regionaler Verantwortung und archivischer Praesentation."
+  },
+  "cities": {
+    "title": "Stadtarchiv",
+    "subtitle": "Waehle eine Stadt und oeffne ihre Kirchen, Messzeiten und editoriale Notizen.",
+    "searchPlaceholder": "Stadt, Land oder Archiv suchen..."
+  },
+  "submit": {
+    "title": "Kirche einreichen",
+    "subtitle": "Hilf mit, das Archiv durch verlaessliche, praezise und faire Einreichungen zu erweitern."
+  }
+}

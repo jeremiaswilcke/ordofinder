@@ -1,6 +1,6 @@
 {
   "nav": {
-    "archive": "Ordofinder Archive",
+    "archive": "Ordofinder Archiv",
     "cities": "Staedte",
     "map": "Karte",
     "submit": "Einreichen",
@@ -10,10 +10,11 @@
   },
   "landing": {
     "eyebrow": "Editoriales Kirchenarchiv",
-    "title": "Find a Worthy Celebration",
-    "subtitle": "Ein stadtzentriertes Archiv fuer katholische Kirchen, Messzeiten, liturgisches Profil und lebendige Gemeinschaft.",
+    "title": "Finde eine wuerdige Feier",
+    "subtitle": "Ein stadtzentriertes Archiv fuer katholische Kirchen, Messzeiten, liturgisches Profil und lebendige Gemeinde.",
     "ctaPrimary": "Staedte durchsuchen",
     "ctaSecondary": "Globale Karte oeffnen",
+    "ctaNearby": "Messe in meiner Naehe",
     "topCities": "Top-Staedte",
     "detectedCity": "Aktueller Stadtkontext",
     "featureTitle": "Trust-Graph statt Verzeichnisrauschen",
@@ -34,22 +35,62 @@
   },
   "cities": {
     "title": "Stadtarchiv",
-    "subtitle": "Waehle eine Stadt und oeffne ihre Kirchen, Messzeiten und editoriale Notizen.",
+    "subtitle": "Waehle eine Stadt und oeffne ihre Kirchen, Messzeiten und editorialen Notizen.",
     "searchPlaceholder": "Stadt, Land oder Archiv suchen..."
   },
   "submit": {
     "title": "Kirche einreichen",
     "subtitle": "Hilf mit, das Archiv durch verlaessliche, praezise und faire Einreichungen zu erweitern."
   },
+  "city": {
+    "recommendedEyebrow": "Besuch lohnt sich",
+    "recommendedHeading": "Redaktionell empfohlen",
+    "recommendedCount": "{count} Kirchen",
+    "alsoEyebrow": "Auch in dieser Stadt",
+    "alsoHeading": "Weitere Eintraege",
+    "alsoSubtitle": "Unterhalb der redaktionellen Schwelle, aber aus Vollstaendigkeit gelistet.",
+    "empty": "Noch keine Kirchen in dieser Stadt. Schau bald wieder vorbei."
+  },
   "masses": {
     "eyebrow": "Als Naechstes",
     "heading": "Naechste Messen",
-    "subtitle": "Die naechsten Feiern in dieser Stadt, mit Uhrzeit und Entfernung zu deinem Standort. Klick auf eine Zeile fuer das Kirchenprofil.",
+    "subtitle": "Die naechsten Feiern in dieser Stadt, mit Uhrzeit, Bewertung und Entfernung zum Standort. Klick auf eine Zeile fuer das Kirchenprofil.",
     "empty": "Keine Messzeiten fuer die naechsten zwei Wochen hinterlegt.",
+    "emptyFiltered": "Keine Messen passen zu diesen Filtern. Locker sie, um mehr zu sehen.",
     "loading": "Zeitplan wird gelesen...",
     "locationCta": "Standort verwenden",
     "locationPrompting": "Standort wird bestimmt...",
     "locationUser": "Entfernung ab deinem Standort",
-    "locationFallback": "Entfernung ab Stadtzentrum"
+    "locationFallback": "Entfernung ab Stadtzentrum",
+    "filter": {
+      "window": "Wann",
+      "windowAll": "Alle",
+      "windowSoon": "Naechste 2 h",
+      "windowToday": "Heute",
+      "form": "Form",
+      "formAll": "Alle",
+      "language": "Sprache",
+      "languageAll": "Alle"
+    },
+    "distanceHint": {
+      "nearby": "sehr nah",
+      "walk": "zu Fuss",
+      "transit": "oeffentlich",
+      "far": "weit"
+    }
+  },
+  "nearby": {
+    "eyebrow": "Messe in deiner Naehe",
+    "heading": "Katholische Messe in deiner Naehe, jetzt",
+    "lead": "Teile deinen Standort — wir zeigen die naechsten Feiern an den naechstgelegenen Kirchen, sortiert nach Zeit, mit Bewertung und Entfernung.",
+    "cta": "Standort teilen",
+    "prompting": "Standort wird bestimmt...",
+    "browseCities": "Stattdessen Staedte durchsuchen",
+    "denied": "Standort wurde nicht freigegeben. Durchsuche bei Bedarf das Stadtarchiv.",
+    "unsupported": "Dein Browser unterstuetzt keinen Standortzugriff. Bitte ueber Staedte suchen.",
+    "headingLocated": "Messen in deiner Naehe",
+    "leadLocated": "Die {count} naechstgelegenen Kirchen aus dem Archiv, sortiert nach Entfernung.",
+    "upcomingHeading": "Naechste Messen in deiner Naehe",
+    "upcomingSubtitle": "Ueber alle nahegelegenen Kirchen hinweg, chronologisch sortiert, mit Bewertung und Entfernung."
   }
 }

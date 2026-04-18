@@ -74,8 +74,8 @@ export default async function LandingPage({
               <h2 className="font-headline text-4xl text-on-surface">Vienna</h2>
               <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">{t("cityFeatureBody")}</p>
               <div className="mt-5 flex flex-wrap gap-3">
-                <Button href={`/${locale}/cities`}>{t("ctaPrimary")}</Button>
-                <Button href={`/${locale}/map`} variant="secondary">{t("ctaSecondary")}</Button>
+                <Button href={`/${locale}/nearby`}>{t("ctaNearby")}</Button>
+                <Button href={`/${locale}/cities`} variant="secondary">{t("ctaPrimary")}</Button>
               </div>
             </div>
           </div>
@@ -96,7 +96,8 @@ export default async function LandingPage({
                 <p className="mt-5 max-w-2xl text-lg leading-relaxed text-on-surface-variant">{t("subtitle")}</p>
               </div>
               <div className="mt-8 flex flex-wrap gap-3">
-                <Button href={`/${locale}/cities`}>{t("ctaPrimary")}</Button>
+                <Button href={`/${locale}/nearby`}>{t("ctaNearby")}</Button>
+                <Button href={`/${locale}/cities`} variant="secondary">{t("ctaPrimary")}</Button>
                 <Button href={`/${locale}/map`} variant="secondary">{t("ctaSecondary")}</Button>
               </div>
             </div>

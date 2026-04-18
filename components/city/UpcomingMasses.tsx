@@ -11,9 +11,14 @@ import {
   type UpcomingMass,
 } from "@/lib/upcomingMasses";
 import { haversineDistanceKm, formatDistanceKm } from "@/lib/geo";
+import { formatRatingLabel } from "@/lib/utils";
 
 type LocationSource = "user" | "city" | "none";
 type PermissionState = "idle" | "prompting" | "granted" | "denied" | "unsupported";
+
+type FormFilter = "all" | "novus_ordo" | "tridentine";
+type WindowFilter = "all" | "soon" | "today";
+type LanguageFilter = "all" | string;
 
 interface Props {
   churches: Church[];
@@ -21,9 +26,13 @@ interface Props {
   cityCenter?: { latitude: number; longitude: number } | null;
   horizonDays?: number;
   limit?: number;
+  heading?: string;
+  subtitle?: string;
 }
 
-function averageCenter(churches: Church[]): { latitude: number; longitude: number } | null {
+function averageCenter(
+  churches: Church[]
+): { latitude: number; longitude: number } | null {
   const valid = churches.filter(
     (c) => Number.isFinite(c.latitude) && Number.isFinite(c.longitude)
   );
@@ -42,12 +51,22 @@ function averageCenter(churches: Church[]): { latitude: number; longitude: numbe
   };
 }
 
+function isSameLocalDate(a: Date, b: Date) {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
 export function UpcomingMasses({
   churches,
   locale,
   cityCenter,
   horizonDays = 14,
-  limit = 12,
+  limit = 30,
+  heading,
+  subtitle,
 }: Props) {
   const t = useTranslations("masses");
   const [now, setNow] = React.useState<Date | null>(null);
@@ -56,6 +75,11 @@ export function UpcomingMasses({
   >(null);
   const [source, setSource] = React.useState<LocationSource>("none");
   const [permission, setPermission] = React.useState<PermissionState>("idle");
+
+  const [formFilter, setFormFilter] = React.useState<FormFilter>("all");
+  const [windowFilter, setWindowFilter] = React.useState<WindowFilter>("all");
+  const [languageFilter, setLanguageFilter] =
+    React.useState<LanguageFilter>("all");
 
   const fallbackCenter = React.useMemo(
     () => cityCenter ?? averageCenter(churches),
@@ -68,7 +92,6 @@ export function UpcomingMasses({
       setCoords(fallbackCenter);
       setSource("city");
     }
-    // Re-tick every minute so "in 5 minutes" stays accurate.
     const i = setInterval(() => setNow(new Date()), 60_000);
     return () => clearInterval(i);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -94,10 +117,36 @@ export function UpcomingMasses({
     );
   }, []);
 
-  const upcoming: UpcomingMass[] = React.useMemo(() => {
+  const allUpcoming: UpcomingMass[] = React.useMemo(() => {
     if (!now) return [];
-    return computeUpcomingMasses(churches, { from: now, horizonDays, limit });
-  }, [churches, now, horizonDays, limit]);
+    return computeUpcomingMasses(churches, {
+      from: now,
+      horizonDays,
+      limit: 200,
+    });
+  }, [churches, now, horizonDays]);
+
+  const languages = React.useMemo(() => {
+    const set = new Set<string>();
+    for (const e of allUpcoming) set.add(e.massTime.language);
+    return Array.from(set).sort();
+  }, [allUpcoming]);
+
+  const filtered = React.useMemo(() => {
+    if (!now) return [];
+    return allUpcoming
+      .filter((e) => {
+        if (formFilter !== "all" && e.massTime.form !== formFilter) return false;
+        if (languageFilter !== "all" && e.massTime.language !== languageFilter)
+          return false;
+        const diffMs = e.when.getTime() - now.getTime();
+        if (windowFilter === "soon" && diffMs > 2 * 60 * 60_000) return false;
+        if (windowFilter === "today" && !isSameLocalDate(e.when, now))
+          return false;
+        return true;
+      })
+      .slice(0, limit);
+  }, [allUpcoming, formFilter, languageFilter, windowFilter, limit, now]);
 
   if (churches.length === 0) return null;
 
@@ -115,10 +164,10 @@ export function UpcomingMasses({
             id="upcoming-masses-heading"
             className="mt-2 font-headline text-2xl font-semibold text-primary md:text-3xl"
           >
-            {t("heading")}
+            {heading ?? t("heading")}
           </h2>
           <p className="mt-2 max-w-2xl text-sm text-on-surface-variant">
-            {t("subtitle")}
+            {subtitle ?? t("subtitle")}
           </p>
         </div>
 
@@ -130,19 +179,33 @@ export function UpcomingMasses({
         />
       </header>
 
+      <FilterBar
+        formFilter={formFilter}
+        windowFilter={windowFilter}
+        languageFilter={languageFilter}
+        languages={languages}
+        onForm={setFormFilter}
+        onWindow={setWindowFilter}
+        onLanguage={setLanguageFilter}
+        t={t}
+      />
+
       {now === null ? (
-        <p className="text-sm text-on-surface-variant">{t("loading")}</p>
-      ) : upcoming.length === 0 ? (
-        <p className="text-sm text-on-surface-variant">{t("empty")}</p>
+        <p className="mt-6 text-sm text-on-surface-variant">{t("loading")}</p>
+      ) : filtered.length === 0 ? (
+        <p className="mt-6 text-sm text-on-surface-variant">
+          {allUpcoming.length === 0 ? t("empty") : t("emptyFiltered")}
+        </p>
       ) : (
-        <ol className="divide-y divide-outline-variant/40">
-          {upcoming.map((entry, idx) => (
+        <ol className="mt-4 divide-y divide-outline-variant/40">
+          {filtered.map((entry, idx) => (
             <MassRow
               key={`${entry.church.slug}-${entry.massTime.weekday}-${entry.massTime.startTime}-${idx}`}
               entry={entry}
               now={now}
               coords={coords}
               locale={locale}
+              t={t}
             />
           ))}
         </ol>
@@ -156,11 +219,13 @@ function MassRow({
   now,
   coords,
   locale,
+  t,
 }: {
   entry: UpcomingMass;
   now: Date;
   coords: { latitude: number; longitude: number } | null;
   locale: string;
+  t: ReturnType<typeof useTranslations>;
 }) {
   const { church, massTime, when } = entry;
   const distance = coords
@@ -174,9 +239,10 @@ function MassRow({
   const isSoon = diffMinutes <= 60;
   const absolute = formatDateTime(when, locale);
   const relative = formatRelativeTime(when, now, locale);
+  const rating = church.ratings.overall;
 
   return (
-    <li className="grid grid-cols-[auto_1fr_auto] items-center gap-4 py-4 md:grid-cols-[auto_1fr_auto_auto]">
+    <li className="grid grid-cols-[auto_1fr_auto] items-center gap-4 py-4 md:grid-cols-[auto_1fr_auto_auto_auto]">
       <div className="w-20 md:w-24">
         <div className="font-headline text-lg text-primary md:text-xl">
           {absolute}
@@ -198,13 +264,24 @@ function MassRow({
           {church.name}
         </Link>
         <div className="truncate text-xs text-on-surface-variant">
-          {massTime.language.toUpperCase()} ·{" "}
-          {formFormLabel(massTime.form)}
+          {massTime.language.toUpperCase()}
+          {formFormLabel(massTime.form)
+            ? ` · ${formFormLabel(massTime.form)}`
+            : ""}
           {massTime.notes ? ` · ${massTime.notes}` : ""}
         </div>
       </div>
 
-      <div className="hidden min-w-0 text-right md:block">
+      <div className="hidden text-right md:block">
+        <div className="font-headline text-base text-on-surface">
+          {rating.toFixed(1)}
+        </div>
+        <div className="text-[10px] uppercase tracking-[0.18em] text-outline">
+          {formatRatingLabel(rating)}
+        </div>
+      </div>
+
+      <div className="hidden text-right md:block">
         <div className="text-xs uppercase tracking-[0.15em] text-outline">
           {church.address.split(",")[0]}
         </div>
@@ -215,14 +292,14 @@ function MassRow({
           {distance === null ? "—" : formatDistanceKm(distance, locale)}
         </div>
         <div className="text-[10px] uppercase tracking-[0.16em] text-outline">
-          {distance === null ? "" : distanceHint(distance)}
+          {distance === null ? "" : t(`distanceHint.${distanceHint(distance)}`)}
         </div>
       </div>
     </li>
   );
 }
 
-function distanceHint(km: number): string {
+function distanceHint(km: number): "nearby" | "walk" | "transit" | "far" {
   if (km < 1) return "nearby";
   if (km < 5) return "walk";
   if (km < 20) return "transit";
@@ -238,6 +315,124 @@ function formFormLabel(form: string): string {
     default:
       return "";
   }
+}
+
+function FilterBar({
+  formFilter,
+  windowFilter,
+  languageFilter,
+  languages,
+  onForm,
+  onWindow,
+  onLanguage,
+  t,
+}: {
+  formFilter: FormFilter;
+  windowFilter: WindowFilter;
+  languageFilter: LanguageFilter;
+  languages: string[];
+  onForm: (v: FormFilter) => void;
+  onWindow: (v: WindowFilter) => void;
+  onLanguage: (v: LanguageFilter) => void;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-y border-outline-variant/40 py-3">
+      <FilterGroup label={t("filter.window")}>
+        <Pill active={windowFilter === "all"} onClick={() => onWindow("all")}>
+          {t("filter.windowAll")}
+        </Pill>
+        <Pill active={windowFilter === "soon"} onClick={() => onWindow("soon")}>
+          {t("filter.windowSoon")}
+        </Pill>
+        <Pill
+          active={windowFilter === "today"}
+          onClick={() => onWindow("today")}
+        >
+          {t("filter.windowToday")}
+        </Pill>
+      </FilterGroup>
+
+      <FilterGroup label={t("filter.form")}>
+        <Pill active={formFilter === "all"} onClick={() => onForm("all")}>
+          {t("filter.formAll")}
+        </Pill>
+        <Pill
+          active={formFilter === "novus_ordo"}
+          onClick={() => onForm("novus_ordo")}
+        >
+          Novus Ordo
+        </Pill>
+        <Pill
+          active={formFilter === "tridentine"}
+          onClick={() => onForm("tridentine")}
+        >
+          Usus Antiquior
+        </Pill>
+      </FilterGroup>
+
+      {languages.length > 1 && (
+        <FilterGroup label={t("filter.language")}>
+          <Pill
+            active={languageFilter === "all"}
+            onClick={() => onLanguage("all")}
+          >
+            {t("filter.languageAll")}
+          </Pill>
+          {languages.map((lang) => (
+            <Pill
+              key={lang}
+              active={languageFilter === lang}
+              onClick={() => onLanguage(lang)}
+            >
+              {lang.toUpperCase()}
+            </Pill>
+          ))}
+        </FilterGroup>
+      )}
+    </div>
+  );
+}
+
+function FilterGroup({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-[10px] uppercase tracking-[0.18em] text-outline">
+        {label}
+      </span>
+      <div className="flex flex-wrap gap-1.5">{children}</div>
+    </div>
+  );
+}
+
+function Pill({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-sm border px-2.5 py-1 text-[11px] uppercase tracking-[0.14em] transition ${
+        active
+          ? "border-primary bg-primary text-on-primary"
+          : "border-outline/50 bg-surface text-on-surface-variant hover:border-primary hover:text-primary"
+      }`}
+    >
+      {children}
+    </button>
+  );
 }
 
 function LocationControl({

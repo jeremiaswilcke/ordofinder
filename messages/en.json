@@ -14,6 +14,7 @@
     "subtitle": "A city-first archive for Catholic churches, Mass times, liturgical character and the living pulse of parish life.",
     "ctaPrimary": "Browse Cities",
     "ctaSecondary": "Open Global Map",
+    "ctaNearby": "Mass near me now",
     "topCities": "Top Cities",
     "detectedCity": "Current city context",
     "featureTitle": "Trust-graph curation, not directory noise",
@@ -41,15 +42,55 @@
     "title": "Submit a Church",
     "subtitle": "Help expand the archive with trustworthy, precise, charitable submissions."
   },
+  "city": {
+    "recommendedEyebrow": "Worth a visit",
+    "recommendedHeading": "Editorially recommended",
+    "recommendedCount": "{count} churches",
+    "alsoEyebrow": "Also in this city",
+    "alsoHeading": "Further entries",
+    "alsoSubtitle": "Below the editorial threshold, but listed for completeness.",
+    "empty": "No churches in this city yet. Check back soon."
+  },
   "masses": {
     "eyebrow": "Up next",
     "heading": "Upcoming Masses",
-    "subtitle": "The next celebrations in this city, with time and distance from your location. Tap a row for the church archive.",
+    "subtitle": "The next celebrations in this city, with time, quality rating and distance from your location. Click a row for the church archive.",
     "empty": "No Mass times on record for the next two weeks.",
+    "emptyFiltered": "No Masses match these filters. Loosen them to see more.",
     "loading": "Reading the schedule...",
     "locationCta": "Use my location",
     "locationPrompting": "Locating...",
     "locationUser": "Distance from your location",
-    "locationFallback": "Distance from city centre"
+    "locationFallback": "Distance from city centre",
+    "filter": {
+      "window": "When",
+      "windowAll": "Any",
+      "windowSoon": "Next 2 h",
+      "windowToday": "Today",
+      "form": "Form",
+      "formAll": "All",
+      "language": "Language",
+      "languageAll": "Any"
+    },
+    "distanceHint": {
+      "nearby": "nearby",
+      "walk": "walk",
+      "transit": "transit",
+      "far": "far"
+    }
+  },
+  "nearby": {
+    "eyebrow": "Find a Mass near you",
+    "heading": "Catholic Mass near you, right now",
+    "lead": "Share your location and we will show the next celebrations at the closest churches — sorted by time, with quality rating and distance.",
+    "cta": "Share my location",
+    "prompting": "Locating...",
+    "browseCities": "Browse cities instead",
+    "denied": "Location was denied. You can still browse the city archive.",
+    "unsupported": "Your browser does not support location access. Please browse by city.",
+    "headingLocated": "Masses near your location",
+    "leadLocated": "The {count} closest churches in the archive, sorted by walking distance.",
+    "upcomingHeading": "Next Masses near you",
+    "upcomingSubtitle": "Across all nearby churches, sorted chronologically with quality rating and distance."
   }
 }

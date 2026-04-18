@@ -1,14 +1,8 @@
 import { redirect } from "next/navigation";
-import { InviteCreateForm } from "@/components/forms/InviteCreateForm";
-import { getCurrentProfile } from "@/lib/auth";
-import { getReviewerDashboardData } from "@/lib/dashboard";
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("en-GB", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
-}
+import { getCurrentProfile, isReviewerOrHigher } from "@/lib/auth";
+import { getModerationQueueForCurrentUser } from "@/lib/moderation";
+import { ModerationQueue } from "@/components/moderation/ModerationQueue";
+import { signOut } from "@/app/[locale]/(auth)/login/actions";
 
 export default async function ReviewerPage({
   params,
@@ -17,105 +11,95 @@ export default async function ReviewerPage({
 }) {
   const { locale } = await params;
   const profile = await getCurrentProfile();
-  if (!profile?.role || !["reviewer", "regional_admin", "global_admin"].includes(profile.role)) {
-    redirect(`/${locale}/login`);
+  if (!profile) redirect(`/${locale}/login`);
+  if (!profile.role) redirect(`/${locale}/apply`);
+  if (!isReviewerOrHigher(profile.role)) {
+    redirect(`/${locale}`);
   }
 
-  const data = await getReviewerDashboardData();
+  const items = await getModerationQueueForCurrentUser(80);
+
+  const tier1Plus =
+    profile.role === "senior_reviewer" ||
+    profile.role === "regional_admin" ||
+    profile.role === "global_admin";
 
   return (
     <div className="space-y-6">
       <section className="rounded-lg bg-surface-container-low p-8">
-        <p className="text-[10px] uppercase tracking-[0.2em] text-outline">Reviewer Dashboard</p>
-        <h1 className="mt-4 font-headline text-5xl text-primary">Regional Queue</h1>
-        <p className="mt-4 text-lg leading-relaxed text-on-surface-variant">
-          Review churches in your assigned territories, watch your invite tree, and keep the archive trustworthy.
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-outline">
+              Reviewer Dashboard
+            </p>
+            <h1 className="mt-4 font-headline text-5xl text-primary">
+              Moderations-Warteschlange
+            </h1>
+            <p className="mt-4 max-w-2xl text-on-surface-variant">
+              Hier siehst du offene Kirchen, Bewertungen und Bewerbungen.
+              {tier1Plus
+                ? " Als Tier 1+ werden deine Signaturen direkt wirksam."
+                : " Als Tier 2 braucht jede Freigabe eine zweite Signatur."}
+            </p>
+          </div>
+          <form action={signOut}>
+            <input type="hidden" name="locale" value={locale} />
+            <button className="rounded border border-outline/60 bg-surface px-3 py-2 text-[10px] uppercase tracking-[0.18em] text-on-surface hover:border-primary hover:text-primary">
+              Abmelden
+            </button>
+          </form>
+        </div>
       </section>
 
-      <div className="grid gap-4 md:grid-cols-4">
-        <div className="rounded-lg bg-surface-container-lowest p-6 shadow-archival">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-outline">Queue</p>
-          <p className="mt-3 font-headline text-4xl text-primary">{data.queue.length}</p>
-        </div>
-        <div className="rounded-lg bg-surface-container-lowest p-6 shadow-archival">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-outline">My Ratings</p>
-          <p className="mt-3 font-headline text-4xl text-primary">{data.myRatings}</p>
-        </div>
-        <div className="rounded-lg bg-surface-container-lowest p-6 shadow-archival">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-outline">Invites Remaining</p>
-          <p className="mt-3 font-headline text-4xl text-primary">{data.myInvitesRemaining}</p>
-        </div>
-        <div className="rounded-lg bg-surface-container-lowest p-6 shadow-archival">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-outline">Invite Tree</p>
-          <p className="mt-3 font-headline text-4xl text-primary">{data.inviteTreeCount}</p>
-        </div>
+      <div className="grid gap-4 md:grid-cols-3">
+        <Stat label="Offen" value={items.length} />
+        <Stat
+          label="Deine Rolle"
+          value={profile.role.replace("_", " ")}
+          monospace
+        />
+        <Stat
+          label="Konto"
+          value={profile.displayName ?? profile.email}
+          monospace
+        />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-[320px_minmax(0,1fr)]">
-        <aside className="rounded-lg bg-surface-container-low p-6">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-outline">My Regions</p>
-          <div className="mt-4 space-y-2">
-            {data.myRegions.map((region) => (
-              <div key={region} className="rounded bg-surface-container-lowest px-4 py-3 text-sm text-on-surface shadow-archival">
-                {region}
-              </div>
-            ))}
-          </div>
-        </aside>
-        <section className="rounded-lg bg-surface-container-low p-6">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-outline">Pending Archive Items</p>
-          <div className="mt-4 space-y-3">
-            {data.queue.map((item) => (
-              <article key={item.id} className="rounded-lg bg-surface-container-lowest p-5 shadow-archival">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <h2 className="font-headline text-2xl text-primary">{item.name}</h2>
-                    <p className="mt-1 text-sm text-on-surface-variant">
-                      {item.city} · {item.countryCode} · {item.region}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-outline">{item.status.replaceAll("_", " ")}</p>
-                    <p className="mt-2 text-sm text-on-surface-variant">{formatDate(item.submittedAt)}</p>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-      </div>
+      <section className="rounded-lg bg-surface-container-low p-6">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-outline">
+          Warteschlange
+        </p>
+        <div className="mt-4">
+          <ModerationQueue
+            initialItems={items}
+            currentUserId={profile.userId}
+            canDecideApplications={tier1Plus}
+          />
+        </div>
+      </section>
+    </div>
+  );
+}
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
-        <section className="rounded-lg bg-surface-container-low p-6">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-outline">Recent Invites</p>
-          <div className="mt-4 space-y-3">
-            {data.recentInvites.length ? data.recentInvites.map((invite) => (
-              <article key={invite.id} className="rounded-lg bg-surface-container-lowest p-5 shadow-archival">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <h2 className="font-medium text-on-surface">{invite.email}</h2>
-                    <p className="mt-1 text-sm text-on-surface-variant">
-                      {invite.regionLabel} · {invite.role.replaceAll("_", " ")}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-outline">
-                      {invite.redeemedAt ? "Redeemed" : "Pending"}
-                    </p>
-                    <p className="mt-2 text-sm text-on-surface-variant">{formatDate(invite.createdAt)}</p>
-                  </div>
-                </div>
-              </article>
-            )) : (
-              <div className="rounded-lg bg-surface-container-lowest p-5 text-sm text-on-surface-variant shadow-archival">
-                No recent invites yet.
-              </div>
-            )}
-          </div>
-        </section>
-        <InviteCreateForm />
-      </div>
+function Stat({
+  label,
+  value,
+  monospace,
+}: {
+  label: string;
+  value: string | number;
+  monospace?: boolean;
+}) {
+  return (
+    <div className="rounded-lg bg-surface-container-lowest p-6 shadow-archival">
+      <p className="text-[10px] uppercase tracking-[0.2em] text-outline">
+        {label}
+      </p>
+      <p
+        className={`mt-3 text-2xl ${monospace ? "font-mono" : "font-headline text-primary"}`}
+      >
+        {value}
+      </p>
     </div>
   );
 }

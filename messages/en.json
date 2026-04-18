@@ -17,7 +17,20 @@
     "topCities": "Top Cities",
     "detectedCity": "Current city context",
     "featureTitle": "Trust-graph curation, not directory noise",
-    "featureBody": "Ordofinder pairs public discovery with reviewer-led verification, regional stewardship and archival presentation."
+    "featureBody": "Ordofinder pairs public discovery with reviewer-led verification, regional stewardship and archival presentation.",
+    "cityGridEyebrow": "City dossiers",
+    "featureCardEyebrow": "Featured archive",
+    "statsCities": "Cities",
+    "statsArchives": "Archives",
+    "statsScore": "Average score",
+    "citySwitch": "Switch city",
+    "livingArchive": "Living archive",
+    "cityFeatureBody": "Browse the strongest city archives first, then move deeper into local churches, schedules and trusted signals.",
+    "tagline": "quae digna sunt memoria",
+    "opening": "An archive is not a list. It is a promise that the beautiful and the true in a city are not lost to casualness. Ordofinder orders churches by the dignity of their celebration, by place, and by the voice in which they speak.",
+    "edition": "Volume IV · No. 12",
+    "issueLabel": "In this issue",
+    "editorialNote": "Opening note"
   },
   "cities": {
     "title": "City Archive",

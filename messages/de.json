@@ -17,7 +17,20 @@
     "topCities": "Top-Staedte",
     "detectedCity": "Aktueller Stadtkontext",
     "featureTitle": "Trust-Graph statt Verzeichnisrauschen",
-    "featureBody": "Ordofinder verbindet oeffentliche Entdeckung mit reviewer-gestuetzter Verifikation, regionaler Verantwortung und archivischer Praesentation."
+    "featureBody": "Ordofinder verbindet oeffentliche Entdeckung mit reviewer-gestuetzter Verifikation, regionaler Verantwortung und archivischer Praesentation.",
+    "cityGridEyebrow": "Stadtdossiers",
+    "featureCardEyebrow": "Archivfokus",
+    "statsCities": "Staedte",
+    "statsArchives": "Archive",
+    "statsScore": "Durchschnitt",
+    "citySwitch": "Stadt wechseln",
+    "livingArchive": "Lebendiges Archiv",
+    "cityFeatureBody": "Beginne mit den staerksten Stadtarchiven und gehe dann tiefer in Kirchen, Messzeiten und verlaessliche Signale.",
+    "tagline": "quae digna sunt memoria",
+    "opening": "Ein Archiv ist keine Liste. Es ist ein Versprechen, dass das Schoene und das Wahre einer Stadt nicht in der Beilaeufigkeit verloren gehen. Ordofinder ordnet Kirchen nach der Wuerde ihrer Feier, nach Ort und nach der Stimme, in der sie sprechen.",
+    "edition": "Band IV · Nr. 12",
+    "issueLabel": "In dieser Ausgabe",
+    "editorialNote": "Eroeffnungsvermerk"
   },
   "cities": {
     "title": "Stadtarchiv",

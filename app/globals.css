@@ -40,25 +40,25 @@
   --color-error-container: #fe8983;
   --color-on-error-container: #752121;
 
-  --color-background: #faf9f8;
-  --color-on-background: #2f3333;
-  --color-surface: #faf9f8;
-  --color-on-surface: #2f3333;
+  --color-background: #f4f1ea;
+  --color-on-background: #171717;
+  --color-surface: #f4f1ea;
+  --color-on-surface: #171717;
   --color-surface-dim: #d6dbda;
-  --color-surface-bright: #faf9f8;
-  --color-surface-container-lowest: #ffffff;
-  --color-surface-container-low: #f3f4f3;
-  --color-surface-container: #edeeed;
-  --color-surface-container-high: #e6e9e8;
-  --color-surface-container-highest: #dfe3e2;
-  --color-surface-variant: #dfe3e2;
-  --color-on-surface-variant: #5b605f;
+  --color-surface-bright: #f4f1ea;
+  --color-surface-container-lowest: #fbfaf6;
+  --color-surface-container-low: #f0ece4;
+  --color-surface-container: #ece8df;
+  --color-surface-container-high: #e7e1d6;
+  --color-surface-container-highest: #dfd8cb;
+  --color-surface-variant: #ddd6ca;
+  --color-on-surface-variant: #4a4741;
   --color-surface-tint: #4e6073;
   --color-inverse-surface: #0d0e0e;
   --color-inverse-on-surface: #9d9d9c;
 
-  --color-outline: #777c7b;
-  --color-outline-variant: #aeb3b2;
+  --color-outline: #cfc9bc;
+  --color-outline-variant: #ddd7c8;
 
   --radius-default: 0.125rem;
   --radius-lg: 0.25rem;
@@ -68,6 +68,7 @@
   --font-headline: "Noto Serif", Georgia, serif;
   --font-body: "Public Sans", system-ui, sans-serif;
   --font-label: "Public Sans", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 
 html,
@@ -85,6 +86,10 @@ body {
 
 .font-headline {
   font-family: var(--font-headline);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
 }
 
 .material-symbols-outlined {
@@ -111,6 +116,27 @@ body {
 
 .archival-shadow {
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.03);
+}
+
+.archival-grid {
+  background-image:
+    linear-gradient(to right, rgba(119, 124, 123, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(119, 124, 123, 0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.archival-wash {
+  background:
+    radial-gradient(circle at top left, rgba(209, 228, 251, 0.7), transparent 38%),
+    radial-gradient(circle at bottom right, rgba(223, 227, 226, 0.9), transparent 42%);
+}
+
+.archival-rule {
+  border-top: 1px solid var(--color-on-surface);
+}
+
+.archival-double-rule {
+  border-top: 4px double var(--color-on-surface);
 }
 
 *:focus-visible {

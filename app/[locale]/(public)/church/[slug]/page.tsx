@@ -14,26 +14,29 @@ export default async function ChurchDetailPage({
   if (!church) notFound();
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-24">
       <ChurchHeroCard church={church} />
       <ChurchMetrics church={church} />
       <SchedulePanel church={church} />
-      <div className="grid gap-4 md:grid-cols-2">
-        <section className="rounded-lg bg-surface-container-low p-8">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-outline">Community Hub</p>
-          <h2 className="mt-3 font-headline text-4xl text-primary">Living Memory</h2>
-          <p className="mt-4 leading-relaxed text-on-surface-variant">
-            Tags, schedules, music practice and parish character are framed as an archive of lived Catholic continuity.
-          </p>
-        </section>
-        <section className="rounded-lg bg-surface-container-lowest p-8 shadow-archival">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-outline">Location Card</p>
-          <h2 className="mt-3 font-headline text-4xl text-primary">{church.address}</h2>
-          <p className="mt-4 leading-relaxed text-on-surface-variant">
+      <section className="overflow-hidden rounded-xl bg-surface-container-low shadow-archival md:grid md:grid-cols-2">
+        <div>
+          <img
+            alt="Map style location preview"
+            className="h-80 w-full object-cover grayscale opacity-60"
+            src="https://images.unsplash.com/photo-1524492449090-ed3f1474f965?auto=format&fit=crop&w=1200&q=80"
+          />
+        </div>
+        <div className="flex flex-col justify-center p-12">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-outline">Visit Us</p>
+          <h2 className="mt-4 font-headline text-3xl font-bold text-primary">{church.address}</h2>
+          <p className="mt-6 font-light text-on-surface-variant">
             {church.city} · {church.countryCode} · {church.timezone}
           </p>
-        </section>
-      </div>
+          <button className="mt-8 self-start rounded bg-primary-container px-6 py-3 text-sm font-semibold text-on-primary-container transition-all hover:brightness-95">
+            Open in Maps
+          </button>
+        </div>
+      </section>
     </div>
   );
 }

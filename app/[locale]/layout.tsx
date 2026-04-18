@@ -3,6 +3,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { BottomNavBar } from "@/components/layout/BottomNavBar";
+import { Footer } from "@/components/layout/Footer";
 import { TopAppBar } from "@/components/layout/TopAppBar";
 import { routing } from "@/i18n/routing";
 
@@ -31,6 +32,7 @@ export default async function LocaleLayout({
       <div className="min-h-screen bg-background pb-20 md:pb-0">
         <TopAppBar locale={locale} />
         <main className="mx-auto max-w-7xl px-4 py-6 md:px-6 md:py-10">{children}</main>
+        <Footer locale={locale} />
         <BottomNavBar locale={locale} />
       </div>
     </NextIntlClientProvider>

@@ -1,21 +1,36 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChurchHeroCard } from "@/components/church/ChurchHeroCard";
 import { ChurchMetrics } from "@/components/church/ChurchMetrics";
 import { SchedulePanel } from "@/components/church/SchedulePanel";
 import { findChurch } from "@/lib/archive";
+import { getCurrentProfile, isReviewerOrHigher } from "@/lib/auth";
 
 export default async function ChurchDetailPage({
   params
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const church = await findChurch(slug);
   if (!church) notFound();
+
+  const profile = await getCurrentProfile();
+  const canEditSchedule = isReviewerOrHigher(profile?.role ?? null);
 
   return (
     <div className="space-y-24">
       <ChurchHeroCard church={church} />
+      {canEditSchedule && (
+        <div className="flex justify-end">
+          <Link
+            href={`/${locale}/church/${slug}/schedule`}
+            className="rounded border border-primary bg-primary/10 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-primary transition hover:bg-primary hover:text-on-primary"
+          >
+            Mess- & Beichtzeiten pflegen
+          </Link>
+        </div>
+      )}
       <ChurchMetrics church={church} />
       <SchedulePanel church={church} />
       <section className="overflow-hidden rounded-xl bg-surface-container-low shadow-archival md:grid md:grid-cols-2">

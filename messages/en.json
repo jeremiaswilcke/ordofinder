@@ -1,46 +1,47 @@
 {
   "nav": {
-    "archive": "Ordofinder Archive",
+    "archive": "Archive",
     "cities": "Cities",
     "map": "Map",
-    "submit": "Submit",
-    "login": "Login",
+    "submit": "Add a church",
+    "login": "Sign in",
+    "apply": "Apply",
     "reviewer": "Reviewer",
     "admin": "Admin"
   },
   "landing": {
     "eyebrow": "Editorial Catholic Directory",
-    "title": "Find a Worthy Celebration",
-    "subtitle": "A city-first archive for Catholic churches, Mass times, liturgical character and the living pulse of parish life.",
-    "ctaPrimary": "Browse Cities",
-    "ctaSecondary": "Open Global Map",
-    "ctaNearby": "Mass near me now",
-    "topCities": "Top Cities",
-    "detectedCity": "Current city context",
-    "featureTitle": "Trust-graph curation, not directory noise",
-    "featureBody": "Ordofinder pairs public discovery with reviewer-led verification, regional stewardship and archival presentation.",
+    "title": "Where you celebrate Mass with dignity",
+    "subtitle": "A city-first directory of Catholic churches, with Mass times, confession times, and editorial ratings for liturgy, sacred music, preaching and parish life.",
+    "ctaPrimary": "Browse cities",
+    "ctaSecondary": "Open global map",
+    "ctaNearby": "Mass near me",
+    "topCities": "Top cities",
+    "detectedCity": "Current city",
+    "featureTitle": "Editorially reviewed, not algorithmically recommended",
+    "featureBody": "Ordofinder pairs public discovery with editorial review by a team of appointed reviewers. Every entry passes a four-eyes check before going public.",
     "cityGridEyebrow": "City dossiers",
-    "featureCardEyebrow": "Featured archive",
+    "featureCardEyebrow": "In focus",
     "statsCities": "Cities",
-    "statsArchives": "Archives",
-    "statsScore": "Average score",
+    "statsArchives": "Churches",
+    "statsScore": "Average",
     "citySwitch": "Switch city",
-    "livingArchive": "Living archive",
-    "cityFeatureBody": "Browse the strongest city archives first, then move deeper into local churches, schedules and trusted signals.",
+    "livingArchive": "Living directory",
+    "cityFeatureBody": "Start with the strongest city dossiers, then move into individual churches, schedules and ratings.",
     "tagline": "quae digna sunt memoria",
-    "opening": "An archive is not a list. It is a promise that the beautiful and the true in a city are not lost to casualness. Ordofinder orders churches by the dignity of their celebration, by place, and by the voice in which they speak.",
-    "edition": "Volume IV · No. 12",
+    "opening": "This directory is not a list. It is a promise that the dignity of a celebration does not disappear into casualness. Ordofinder orders churches by the care of their liturgy, by place, and by the voice in which they speak.",
+    "edition": "Vol. I · No. 1",
     "issueLabel": "In this issue",
-    "editorialNote": "Opening note"
+    "editorialNote": "Editorial"
   },
   "cities": {
-    "title": "City Archive",
+    "title": "City Directory",
     "subtitle": "Choose a city to open its churches, schedules and editorial notes.",
-    "searchPlaceholder": "Search city, country or archive..."
+    "searchPlaceholder": "Search city, country or church..."
   },
   "submit": {
-    "title": "Submit a Church",
-    "subtitle": "Help expand the archive with trustworthy, precise, charitable submissions."
+    "title": "Add a Church",
+    "subtitle": "A new entry in the Ordofinder directory. Published once cleared in the four-eyes review."
   },
   "city": {
     "recommendedEyebrow": "Worth a visit",
@@ -48,18 +49,18 @@
     "recommendedCount": "{count} churches",
     "alsoEyebrow": "Also in this city",
     "alsoHeading": "Further entries",
-    "alsoSubtitle": "Below the editorial threshold, but listed for completeness.",
-    "empty": "No churches in this city yet. Check back soon."
+    "alsoSubtitle": "Below the editorial threshold — listed for completeness.",
+    "empty": "No churches listed yet in this city."
   },
   "masses": {
     "eyebrow": "Up next",
     "heading": "Upcoming Masses",
-    "subtitle": "The next celebrations in this city, with time, quality rating and distance from your location. Click a row for the church archive.",
+    "subtitle": "The next celebrations in this city, with time, editorial rating and distance from your location. Tap a row for the church profile.",
     "empty": "No Mass times on record for the next two weeks.",
     "emptyFiltered": "No Masses match these filters. Loosen them to see more.",
-    "loading": "Reading the schedule...",
+    "loading": "Loading schedule…",
     "locationCta": "Use my location",
-    "locationPrompting": "Locating...",
+    "locationPrompting": "Locating…",
     "locationUser": "Distance from your location",
     "locationFallback": "Distance from city centre",
     "filter": {
@@ -80,17 +81,17 @@
     }
   },
   "nearby": {
-    "eyebrow": "Find a Mass near you",
-    "heading": "Catholic Mass near you, right now",
-    "lead": "Share your location and we will show the next celebrations at the closest churches — sorted by time, with quality rating and distance.",
+    "eyebrow": "Mass near you",
+    "heading": "Catholic Mass near you — right now",
+    "lead": "Share your location. We will show the next Masses at the closest churches, sorted chronologically, with editorial rating and distance.",
     "cta": "Share my location",
-    "prompting": "Locating...",
+    "prompting": "Locating…",
     "browseCities": "Browse cities instead",
-    "denied": "Location was denied. You can still browse the city archive.",
+    "denied": "Location was denied. You can still browse the city directory.",
     "unsupported": "Your browser does not support location access. Please browse by city.",
     "headingLocated": "Masses near your location",
-    "leadLocated": "The {count} closest churches in the archive, sorted by walking distance.",
+    "leadLocated": "The {count} closest churches in the directory.",
     "upcomingHeading": "Next Masses near you",
-    "upcomingSubtitle": "Across all nearby churches, sorted chronologically with quality rating and distance."
+    "upcomingSubtitle": "Across all nearby churches, sorted chronologically."
   }
 }

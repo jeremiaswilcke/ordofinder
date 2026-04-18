@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { ChurchHeroCard } from "@/components/church/ChurchHeroCard";
 import { ChurchMetrics } from "@/components/church/ChurchMetrics";
 import { SchedulePanel } from "@/components/church/SchedulePanel";
@@ -17,6 +18,7 @@ export default async function ChurchDetailPage({
 
   const profile = await getCurrentProfile();
   const canEditSchedule = isReviewerOrHigher(profile?.role ?? null);
+  const t = await getTranslations({ locale, namespace: "schedule" });
 
   return (
     <div className="space-y-24">
@@ -27,7 +29,7 @@ export default async function ChurchDetailPage({
             href={`/${locale}/church/${slug}/schedule`}
             className="rounded border border-primary bg-primary/10 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-primary transition hover:bg-primary hover:text-on-primary"
           >
-            Mess- & Beichtzeiten pflegen
+            {t("editLink")}
           </Link>
         </div>
       )}

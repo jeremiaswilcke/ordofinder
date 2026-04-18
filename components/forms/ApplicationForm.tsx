@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 
 type Props = {
   defaultDisplayName?: string;
@@ -13,6 +14,7 @@ export function ApplicationForm({
   locale,
   onSuccessHref,
 }: Props) {
+  const t = useTranslations("apply");
   const [form, setForm] = React.useState({
     displayName: defaultDisplayName,
     about: "",
@@ -67,17 +69,24 @@ export function ApplicationForm({
   const fieldCls =
     "w-full rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-4 py-3 text-on-surface focus:border-primary focus:outline-none";
 
+  function errorSuffix(): string {
+    if (error === "application_already_pending") return t("errorAlreadyPending");
+    if (error === "already_has_role") return t("errorAlreadyRole");
+    if (error === "unauthenticated") return t("errorUnauthenticated");
+    return t("errorGeneric");
+  }
+
   return (
     <form onSubmit={onSubmit} className="space-y-6" noValidate>
       <div>
         <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">
-          Anzeigename
+          {t("formDisplayName")}
         </label>
         <input
           className={fieldCls}
           value={form.displayName}
           onChange={(e) => update("displayName", e.target.value)}
-          placeholder="So erscheinst du im Archiv"
+          placeholder={t("formDisplayNamePlaceholder")}
           required
           minLength={2}
           maxLength={120}
@@ -86,13 +95,13 @@ export function ApplicationForm({
 
       <div>
         <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">
-          Wer bist du?
+          {t("formAbout")}
         </label>
         <textarea
           className={`${fieldCls} min-h-32 resize-y`}
           value={form.about}
           onChange={(e) => update("about", e.target.value)}
-          placeholder="Kurzer Abriss: Alter, Beruf, Beziehung zum Glauben und zur Liturgie, vorhandene Bezugsgemeinde…"
+          placeholder={t("formAboutPlaceholder")}
           required
           minLength={10}
           maxLength={2000}
@@ -101,13 +110,13 @@ export function ApplicationForm({
 
       <div>
         <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">
-          Warum möchtest du reviewen?
+          {t("formMotivation")}
         </label>
         <textarea
           className={`${fieldCls} min-h-32 resize-y`}
           value={form.motivation}
           onChange={(e) => update("motivation", e.target.value)}
-          placeholder="Was treibt dich an, wo und wie möchtest du beitragen, welche liturgischen Erfahrungen hast du…"
+          placeholder={t("formMotivationPlaceholder")}
           required
           minLength={10}
           maxLength={2000}
@@ -117,7 +126,7 @@ export function ApplicationForm({
       <div className="grid gap-4 md:grid-cols-2">
         <div>
           <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">
-            Bevorzugtes Land (ISO-2)
+            {t("formCountry")}
           </label>
           <input
             className={fieldCls}
@@ -125,13 +134,13 @@ export function ApplicationForm({
             onChange={(e) =>
               update("preferredCountryCode", e.target.value.toUpperCase())
             }
-            placeholder="AT"
+            placeholder={t("formCountryPlaceholder")}
             maxLength={2}
           />
         </div>
         <div>
           <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">
-            Subdivision (optional)
+            {t("formSubdivision")}
           </label>
           <input
             className={fieldCls}
@@ -139,45 +148,35 @@ export function ApplicationForm({
             onChange={(e) =>
               update("preferredSubdivisionCode", e.target.value.toUpperCase())
             }
-            placeholder="AT-9"
+            placeholder={t("formSubdivisionPlaceholder")}
             maxLength={10}
           />
         </div>
       </div>
 
       <div className="flex items-center justify-between gap-4 border-t border-outline-variant/30 pt-6">
-        <p className="text-xs text-on-surface-variant">
-          Bearbeitung durch Tier 0 oder Global Admin — typisch innerhalb einer
-          Woche.
-        </p>
+        <p className="text-xs text-on-surface-variant">{t("formHint")}</p>
         <button
           type="submit"
           disabled={status === "sending" || status === "ok"}
           className="rounded bg-primary px-6 py-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-on-primary transition hover:bg-primary-dim disabled:opacity-60"
         >
           {status === "sending"
-            ? "Senden…"
+            ? t("submitSending")
             : status === "ok"
-              ? "Danke — Weiterleitung…"
-              : "Bewerbung einreichen"}
+              ? t("submitSuccess")
+              : t("submitButton")}
         </button>
       </div>
 
       {status === "error" && (
         <p className="text-sm text-error-container">
-          Das hat nicht geklappt
-          {error === "application_already_pending"
-            ? ": es gibt schon eine offene Bewerbung von dir."
-            : error === "already_has_role"
-              ? ": du hast bereits eine Rolle."
-              : error === "unauthenticated"
-                ? ": du bist nicht eingeloggt."
-                : "."}{" "}
+          {errorSuffix()}{" "}
           <a
             href={`/${locale}/login`}
             className="text-primary hover:underline"
           >
-            Anmelden
+            {t("signInLink")}
           </a>
           .
         </p>

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { getCurrentProfile } from "@/lib/auth";
 import {
   getModerationQueueForCurrentUser,
@@ -20,7 +21,8 @@ export default async function AdminPage({
     redirect(`/${locale}`);
   }
 
-  const [items, profiles] = await Promise.all([
+  const [t, items, profiles] = await Promise.all([
+    getTranslations({ locale, namespace: "admin" }),
     getModerationQueueForCurrentUser(200),
     listAllProfiles(),
   ]);
@@ -31,37 +33,33 @@ export default async function AdminPage({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-[10px] uppercase tracking-[0.2em] text-outline">
-              Admin Dashboard
+              {t("eyebrow")}
             </p>
             <h1 className="mt-4 font-headline text-5xl text-primary">
-              Stewardship
+              {t("heading")}
             </h1>
             <p className="mt-4 max-w-2xl text-on-surface-variant">
-              Moderations-Queue über das gesamte Archiv, Bewerbungen und
-              Rollenverwaltung.
+              {t("lead")}
             </p>
           </div>
           <form action={signOut}>
             <input type="hidden" name="locale" value={locale} />
             <button className="rounded border border-outline/60 bg-surface px-3 py-2 text-[10px] uppercase tracking-[0.18em] text-on-surface hover:border-primary hover:text-primary">
-              Abmelden
+              {t("signOut")}
             </button>
           </form>
         </div>
       </section>
 
       <div className="grid gap-4 md:grid-cols-4">
-        <Stat label="Queue" value={items.length} />
+        <Stat label={t("statQueue")} value={items.length} />
+        <Stat label={t("statProfiles")} value={profiles.length} />
         <Stat
-          label="Profile gesamt"
-          value={profiles.length}
-        />
-        <Stat
-          label="Reviewer"
+          label={t("statReviewers")}
           value={profiles.filter((p) => p.role === "reviewer").length}
         />
         <Stat
-          label="Senior / Admin"
+          label={t("statAdmins")}
           value={
             profiles.filter(
               (p) =>
@@ -76,7 +74,7 @@ export default async function AdminPage({
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
         <section className="rounded-lg bg-surface-container-low p-6">
           <p className="text-[10px] uppercase tracking-[0.2em] text-outline">
-            Moderations-Queue
+            {t("queueTitle")}
           </p>
           <div className="mt-4">
             <ModerationQueue
@@ -88,7 +86,7 @@ export default async function AdminPage({
         </section>
         <aside className="rounded-lg bg-surface-container-low p-6">
           <p className="text-[10px] uppercase tracking-[0.2em] text-outline">
-            Rollen verwalten
+            {t("rolesTitle")}
           </p>
           <div className="mt-4">
             <RoleManager

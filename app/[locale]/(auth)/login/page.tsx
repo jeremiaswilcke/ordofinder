@@ -1,26 +1,18 @@
+import { getTranslations } from "next-intl/server";
 import {
   signInWithEmail,
   signInWithGoogle,
   signUpWithEmail,
 } from "./actions";
 
-const ERROR_LABELS: Record<string, string> = {
-  supabase_not_configured:
-    "Supabase ist nicht konfiguriert. Bitte Admin kontaktieren.",
-  missing_code: "OAuth-Code fehlt. Bitte erneut versuchen.",
-  oauth_failed: "Google-Login fehlgeschlagen. Bitte erneut versuchen.",
-  "Invalid login credentials":
-    "E-Mail oder Passwort stimmen nicht. Noch kein Konto? Jetzt anlegen.",
-  "Email not confirmed":
-    "Bitte bestätige deine E-Mail (Postfach prüfen), dann melde dich an.",
-  "User already registered":
-    "E-Mail bereits registriert. Melde dich stattdessen an.",
+const ERROR_KEY_BY_RAW: Record<string, string> = {
+  supabase_not_configured: "errorSupabase",
+  missing_code: "errorMissingCode",
+  oauth_failed: "errorOauth",
+  "Invalid login credentials": "errorInvalidCredentials",
+  "Email not confirmed": "errorNotConfirmed",
+  "User already registered": "errorAlreadyRegistered",
 };
-
-function labelFor(raw?: string): string | null {
-  if (!raw) return null;
-  return ERROR_LABELS[raw] ?? raw;
-}
 
 export default async function LoginPage({
   params,
@@ -32,21 +24,24 @@ export default async function LoginPage({
   const { locale } = await params;
   const { mode, error, info } = await searchParams;
   const isSignup = mode === "signup";
-  const errorLabel = labelFor(error);
+  const t = await getTranslations({ locale, namespace: "auth" });
+
+  const errorKey = error ? ERROR_KEY_BY_RAW[error] ?? null : null;
+  const errorLabel = errorKey
+    ? t(errorKey as never)
+    : error ?? null;
 
   return (
     <section className="mx-auto max-w-2xl space-y-6 rounded-lg bg-surface-container-low p-8">
       <div>
         <p className="text-[10px] uppercase tracking-[0.2em] text-outline">
-          {isSignup ? "Neues Konto" : "Login"}
+          {isSignup ? t("signUpEyebrow") : t("signInEyebrow")}
         </p>
         <h1 className="mt-4 font-headline text-5xl text-primary">
-          {isSignup ? "Konto anlegen" : "Anmelden"}
+          {isSignup ? t("signUpHeading") : t("signInHeading")}
         </h1>
         <p className="mt-4 text-on-surface-variant">
-          {isSignup
-            ? "Registriere dich, um dich anschließend als Reviewer zu bewerben."
-            : "Melde dich mit deinem Reviewer-Konto an."}
+          {isSignup ? t("signUpLead") : t("signInLead")}
         </p>
       </div>
 
@@ -57,22 +52,21 @@ export default async function LoginPage({
       )}
       {info === "confirm_email" && (
         <div className="rounded-lg border border-outline-variant/30 bg-surface-container-lowest px-4 py-3 text-sm text-on-surface-variant">
-          Konto angelegt. Prüfe dein Postfach und bestätige die E-Mail, dann
-          kannst du dich anmelden.
+          {t("confirmEmail")}
         </div>
       )}
 
-      <form action={signInWithGoogle} className="">
+      <form action={signInWithGoogle}>
         <input type="hidden" name="locale" value={locale} />
         <button className="flex w-full items-center justify-center gap-3 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-5 py-3 text-sm font-semibold text-on-surface transition hover:border-primary hover:text-primary">
           <GoogleMark />
-          {isSignup ? "Mit Google anlegen" : "Mit Google anmelden"}
+          {isSignup ? t("googleSignUp") : t("googleSignIn")}
         </button>
       </form>
 
       <div className="flex items-center gap-3 text-[10px] uppercase tracking-[0.18em] text-outline">
         <span className="h-px flex-1 bg-outline-variant/40" />
-        oder
+        {t("orSeparator")}
         <span className="h-px flex-1 bg-outline-variant/40" />
       </div>
 
@@ -85,11 +79,11 @@ export default async function LoginPage({
         {isSignup && (
           <div>
             <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">
-              Anzeigename
+              {t("displayName")}
             </label>
             <input
               className="w-full rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-4 py-3"
-              placeholder="Max Mustermann"
+              placeholder={t("displayNamePlaceholder")}
               name="displayName"
               required
               minLength={2}
@@ -100,11 +94,11 @@ export default async function LoginPage({
 
         <div>
           <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">
-            E-Mail
+            {t("email")}
           </label>
           <input
             className="w-full rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-4 py-3"
-            placeholder="name@example.com"
+            placeholder={t("emailPlaceholder")}
             name="email"
             type="email"
             required
@@ -113,12 +107,12 @@ export default async function LoginPage({
 
         <div>
           <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">
-            Passwort
+            {t("password")}
           </label>
           <input
             className="w-full rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-4 py-3"
             type="password"
-            placeholder="•••••••"
+            placeholder={t("passwordPlaceholder")}
             name="password"
             required
             minLength={8}
@@ -126,29 +120,29 @@ export default async function LoginPage({
         </div>
 
         <button className="w-full rounded bg-primary px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-on-primary transition hover:bg-primary-dim">
-          {isSignup ? "Konto anlegen" : "Anmelden"}
+          {isSignup ? t("signUpSubmit") : t("signInSubmit")}
         </button>
       </form>
 
       <div className="border-t border-outline-variant/30 pt-6 text-sm text-on-surface-variant">
         {isSignup ? (
           <>
-            Schon ein Konto?{" "}
+            {t("toSignIn")}{" "}
             <a
               href={`/${locale}/login`}
               className="text-primary hover:underline"
             >
-              Anmelden
+              {t("toSignInLink")}
             </a>
           </>
         ) : (
           <>
-            Noch kein Konto?{" "}
+            {t("toSignUp")}{" "}
             <a
               href={`/${locale}/login?mode=signup`}
               className="text-primary hover:underline"
             >
-              Konto anlegen und bewerben
+              {t("toSignUpLink")}
             </a>
           </>
         )}

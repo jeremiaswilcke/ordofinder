@@ -1,20 +1,11 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import type {
   ConfessionTimeRow,
   MassTimeRow,
 } from "@/lib/schedules";
-
-const WEEKDAYS_DE = [
-  "Sonntag",
-  "Montag",
-  "Dienstag",
-  "Mittwoch",
-  "Donnerstag",
-  "Freitag",
-  "Samstag",
-];
 
 const RITES = [
   "roman",
@@ -48,6 +39,10 @@ export function ScheduleEditor({
   currentUserId,
   canDeleteAny,
 }: Props) {
+  const t = useTranslations("schedule");
+  const weekdays = t.raw("weekdays") as string[];
+  const riteLabels = t.raw("riteLabels") as Record<string, string>;
+  const formLabels = t.raw("formLabels") as Record<string, string>;
   const [masses, setMasses] = React.useState(initialMasses);
   const [confessions, setConfessions] = React.useState(initialConfessions);
 
@@ -135,11 +130,10 @@ export function ScheduleEditor({
     <div className="space-y-10">
       <section className="space-y-4">
         <header>
-          <h2 className="font-headline text-2xl text-primary">Messzeiten</h2>
-          <p className="text-sm text-on-surface-variant">
-            Wochentag, Uhrzeit, Sprache, Ritus und Form. „Usus Antiquior" für
-            die außerordentliche Form nutzen.
-          </p>
+          <h2 className="font-headline text-2xl text-primary">
+            {t("massesHeading")}
+          </h2>
+          <p className="text-sm text-on-surface-variant">{t("massesLead")}</p>
         </header>
 
         <MassList
@@ -147,17 +141,30 @@ export function ScheduleEditor({
           canDeleteAny={canDeleteAny}
           currentUserId={currentUserId}
           onRemove={removeMass}
+          weekdays={weekdays}
+          riteLabels={riteLabels}
+          formLabels={formLabels}
+          emptyLabel={t("massesEmpty")}
+          removeLabel={t("remove")}
+          remoteLocked={t("remoteLocked")}
         />
 
-        <MassForm onSubmit={addMass} />
+        <MassForm
+          onSubmit={addMass}
+          weekdays={weekdays}
+          riteLabels={riteLabels}
+          formLabels={formLabels}
+          t={t}
+        />
       </section>
 
       <section className="space-y-4">
         <header>
-          <h2 className="font-headline text-2xl text-primary">Beichtzeiten</h2>
+          <h2 className="font-headline text-2xl text-primary">
+            {t("confessionsHeading")}
+          </h2>
           <p className="text-sm text-on-surface-variant">
-            Wochentag, Uhrzeit (und optional Ende), Sprache, Hinweis. Bei „nach
-            Vereinbarung" einen Hinweis setzen.
+            {t("confessionsLead")}
           </p>
         </header>
 
@@ -166,9 +173,17 @@ export function ScheduleEditor({
           canDeleteAny={canDeleteAny}
           currentUserId={currentUserId}
           onRemove={removeConfession}
+          weekdays={weekdays}
+          emptyLabel={t("confessionsEmpty")}
+          removeLabel={t("remove")}
+          remoteLocked={t("remoteLocked")}
         />
 
-        <ConfessionForm onSubmit={addConfession} />
+        <ConfessionForm
+          onSubmit={addConfession}
+          weekdays={weekdays}
+          t={t}
+        />
       </section>
     </div>
   );
@@ -181,16 +196,28 @@ function MassList({
   canDeleteAny,
   currentUserId,
   onRemove,
+  weekdays,
+  riteLabels,
+  formLabels,
+  emptyLabel,
+  removeLabel,
+  remoteLocked,
 }: {
   items: MassTimeRow[];
   canDeleteAny: boolean;
   currentUserId: string;
   onRemove: (id: string) => void;
+  weekdays: string[];
+  riteLabels: Record<string, string>;
+  formLabels: Record<string, string>;
+  emptyLabel: string;
+  removeLabel: string;
+  remoteLocked: string;
 }) {
   if (items.length === 0) {
     return (
       <p className="rounded border border-outline-variant/30 bg-surface-container-lowest p-4 text-sm text-on-surface-variant">
-        Noch keine Messzeiten eingetragen.
+        {emptyLabel}
       </p>
     );
   }
@@ -204,10 +231,11 @@ function MassList({
             className="grid grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-3 text-sm"
           >
             <span className="font-headline text-base text-primary">
-              {WEEKDAYS_DE[m.weekday]} · {m.startTime}
+              {weekdays[m.weekday]} · {m.startTime}
             </span>
             <span className="text-on-surface-variant">
-              {m.languageCode.toUpperCase()} · {formLabel(m.form)} · {riteLabel(m.rite)}
+              {m.languageCode.toUpperCase()} · {formLabels[m.form] ?? m.form} ·{" "}
+              {riteLabels[m.rite] ?? m.rite}
               {m.notes ? ` · ${m.notes}` : ""}
             </span>
             {canDelete ? (
@@ -216,11 +244,11 @@ function MassList({
                 onClick={() => onRemove(m.id)}
                 className="rounded border border-outline/60 px-2 py-1 text-[10px] uppercase tracking-[0.14em] text-on-surface-variant hover:border-error hover:text-error"
               >
-                Entfernen
+                {removeLabel}
               </button>
             ) : (
               <span className="text-[10px] uppercase tracking-[0.14em] text-outline">
-                fremd
+                {remoteLocked}
               </span>
             )}
           </li>
@@ -235,16 +263,24 @@ function ConfessionList({
   canDeleteAny,
   currentUserId,
   onRemove,
+  weekdays,
+  emptyLabel,
+  removeLabel,
+  remoteLocked,
 }: {
   items: ConfessionTimeRow[];
   canDeleteAny: boolean;
   currentUserId: string;
   onRemove: (id: string) => void;
+  weekdays: string[];
+  emptyLabel: string;
+  removeLabel: string;
+  remoteLocked: string;
 }) {
   if (items.length === 0) {
     return (
       <p className="rounded border border-outline-variant/30 bg-surface-container-lowest p-4 text-sm text-on-surface-variant">
-        Noch keine Beichtzeiten eingetragen.
+        {emptyLabel}
       </p>
     );
   }
@@ -258,7 +294,7 @@ function ConfessionList({
             className="grid grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-3 text-sm"
           >
             <span className="font-headline text-base text-primary">
-              {WEEKDAYS_DE[c.weekday]} · {c.startTime}
+              {weekdays[c.weekday]} · {c.startTime}
               {c.endTime ? `–${c.endTime}` : ""}
             </span>
             <span className="text-on-surface-variant">
@@ -271,11 +307,11 @@ function ConfessionList({
                 onClick={() => onRemove(c.id)}
                 className="rounded border border-outline/60 px-2 py-1 text-[10px] uppercase tracking-[0.14em] text-on-surface-variant hover:border-error hover:text-error"
               >
-                Entfernen
+                {removeLabel}
               </button>
             ) : (
               <span className="text-[10px] uppercase tracking-[0.14em] text-outline">
-                fremd
+                {remoteLocked}
               </span>
             )}
           </li>
@@ -296,7 +332,21 @@ type MassFormState = {
   notes?: string;
 };
 
-function MassForm({ onSubmit }: { onSubmit: (f: MassFormState) => Promise<void> }) {
+type TranslateFn = ReturnType<typeof useTranslations>;
+
+function MassForm({
+  onSubmit,
+  weekdays,
+  riteLabels,
+  formLabels,
+  t,
+}: {
+  onSubmit: (f: MassFormState) => Promise<void>;
+  weekdays: string[];
+  riteLabels: Record<string, string>;
+  formLabels: Record<string, string>;
+  t: TranslateFn;
+}) {
   const [state, setState] = React.useState<MassFormState>({
     weekday: 0,
     startTime: "09:30",
@@ -326,18 +376,18 @@ function MassForm({ onSubmit }: { onSubmit: (f: MassFormState) => Promise<void> 
       className="grid gap-3 rounded border border-outline-variant/30 bg-surface-container-low p-4 md:grid-cols-6"
     >
       <Select
-        label="Tag"
+        label={t("day")}
         value={state.weekday}
         onChange={(v) => setState((s) => ({ ...s, weekday: Number(v) }))}
-        options={WEEKDAYS_DE.map((d, i) => ({ label: d, value: i }))}
+        options={weekdays.map((d, i) => ({ label: d, value: i }))}
       />
       <TimeInput
-        label="Beginn"
+        label={t("start")}
         value={state.startTime}
         onChange={(v) => setState((s) => ({ ...s, startTime: v }))}
       />
       <TextInput
-        label="Sprache"
+        label={t("language")}
         value={state.languageCode}
         onChange={(v) =>
           setState((s) => ({ ...s, languageCode: v.toLowerCase() }))
@@ -346,34 +396,43 @@ function MassForm({ onSubmit }: { onSubmit: (f: MassFormState) => Promise<void> 
         maxLength={8}
       />
       <Select
-        label="Ritus"
+        label={t("rite")}
         value={state.rite}
-        onChange={(v) => setState((s) => ({ ...s, rite: v as MassFormState["rite"] }))}
-        options={RITES.map((r) => ({ label: riteLabel(r), value: r }))}
+        onChange={(v) =>
+          setState((s) => ({ ...s, rite: v as MassFormState["rite"] }))
+        }
+        options={RITES.map((r) => ({
+          label: riteLabels[r] ?? r,
+          value: r,
+        }))}
       />
       <Select
-        label="Form"
+        label={t("form")}
         value={state.form}
-        onChange={(v) => setState((s) => ({ ...s, form: v as MassFormState["form"] }))}
-        options={FORMS.map((f) => ({ label: formLabel(f), value: f }))}
+        onChange={(v) =>
+          setState((s) => ({ ...s, form: v as MassFormState["form"] }))
+        }
+        options={FORMS.map((f) => ({
+          label: formLabels[f] ?? f,
+          value: f,
+        }))}
       />
       <TextInput
-        label="Notiz"
+        label={t("note")}
         value={state.notes ?? ""}
         onChange={(v) => setState((s) => ({ ...s, notes: v }))}
-        placeholder="optional"
         maxLength={200}
       />
       <div className="md:col-span-6 flex items-center justify-between">
         <p className="text-xs text-on-surface-variant">
-          {err ? `Fehler: ${err}` : "Eintrag speichert direkt."}
+          {err ? `${t("errorPrefix" as never) ?? "Error"}: ${err}` : t("autoSave")}
         </p>
         <button
           type="submit"
           disabled={busy}
           className="rounded bg-primary px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-on-primary hover:bg-primary-dim disabled:opacity-50"
         >
-          {busy ? "Speichern…" : "Messzeit hinzufügen"}
+          {busy ? t("saving") : t("addMass")}
         </button>
       </div>
     </form>
@@ -390,8 +449,12 @@ type ConfessionFormState = {
 
 function ConfessionForm({
   onSubmit,
+  weekdays,
+  t,
 }: {
   onSubmit: (f: ConfessionFormState) => Promise<void>;
+  weekdays: string[];
+  t: TranslateFn;
 }) {
   const [state, setState] = React.useState<ConfessionFormState>({
     weekday: 5,
@@ -425,47 +488,48 @@ function ConfessionForm({
       className="grid gap-3 rounded border border-outline-variant/30 bg-surface-container-low p-4 md:grid-cols-6"
     >
       <Select
-        label="Tag"
+        label={t("day")}
         value={state.weekday}
         onChange={(v) => setState((s) => ({ ...s, weekday: Number(v) }))}
-        options={WEEKDAYS_DE.map((d, i) => ({ label: d, value: i }))}
+        options={weekdays.map((d, i) => ({ label: d, value: i }))}
       />
       <TimeInput
-        label="Beginn"
+        label={t("start")}
         value={state.startTime}
         onChange={(v) => setState((s) => ({ ...s, startTime: v }))}
       />
       <TimeInput
-        label="Ende"
+        label={t("endOptional")}
         value={state.endTime ?? ""}
         onChange={(v) => setState((s) => ({ ...s, endTime: v }))}
-        optional
       />
       <TextInput
-        label="Sprache"
+        label={t("language")}
         value={state.languageCode ?? ""}
-        onChange={(v) => setState((s) => ({ ...s, languageCode: v.toLowerCase() }))}
+        onChange={(v) =>
+          setState((s) => ({ ...s, languageCode: v.toLowerCase() }))
+        }
         placeholder="de"
         maxLength={8}
       />
       <TextInput
-        label="Hinweis"
+        label={t("hint")}
         value={state.notes ?? ""}
         onChange={(v) => setState((s) => ({ ...s, notes: v }))}
-        placeholder="z.B. nach Vereinbarung"
+        placeholder={t("hintPlaceholder")}
         maxLength={200}
         colSpan={2}
       />
       <div className="md:col-span-6 flex items-center justify-between">
         <p className="text-xs text-on-surface-variant">
-          {err ? `Fehler: ${err}` : "Eintrag speichert direkt."}
+          {err ? `Error: ${err}` : t("autoSave")}
         </p>
         <button
           type="submit"
           disabled={busy}
           className="rounded bg-primary px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-on-primary hover:bg-primary-dim disabled:opacity-50"
         >
-          {busy ? "Speichern…" : "Beichtzeit hinzufügen"}
+          {busy ? t("saving") : t("addConfession")}
         </button>
       </div>
     </form>
@@ -542,18 +606,15 @@ function TimeInput({
   label,
   value,
   onChange,
-  optional,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
-  optional?: boolean;
 }) {
   return (
     <label className="flex flex-col gap-1">
       <span className="text-[10px] uppercase tracking-[0.18em] text-outline">
         {label}
-        {optional ? " (optional)" : ""}
       </span>
       <input
         type="time"
@@ -563,46 +624,4 @@ function TimeInput({
       />
     </label>
   );
-}
-
-// --- Labels -------------------------------------------------------------
-
-function riteLabel(rite: string): string {
-  switch (rite) {
-    case "roman":
-      return "Römisch";
-    case "byzantine":
-      return "Byzantinisch";
-    case "maronite":
-      return "Maronitisch";
-    case "chaldean":
-      return "Chaldäisch";
-    case "syro_malabar":
-      return "Syro-Malabar";
-    case "syro_malankara":
-      return "Syro-Malankara";
-    case "coptic_catholic":
-      return "Koptisch-kath.";
-    case "ethiopian_catholic":
-      return "Äthiopisch-kath.";
-    case "armenian_catholic":
-      return "Armenisch-kath.";
-    case "ambrosian":
-      return "Ambrosianisch";
-    case "mozarabic":
-      return "Mozarabisch";
-    default:
-      return "sonstiger";
-  }
-}
-
-function formLabel(form: string): string {
-  switch (form) {
-    case "novus_ordo":
-      return "Novus Ordo";
-    case "tridentine":
-      return "Usus Antiquior";
-    default:
-      return "nicht anwendbar";
-  }
 }

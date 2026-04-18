@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Chip } from "../ui/Chip";
 import { Icon } from "../ui/Icon";
+import { LocaleSwitch } from "./LocaleSwitch";
 import { getCurrentProfile, isReviewerOrHigher } from "@/lib/auth";
 
 const NAV_LINK =
@@ -67,12 +68,7 @@ export async function TopAppBar({ locale }: { locale: string }) {
           <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-outline">
             {landing("edition")}
           </span>
-          <Link
-            href={`/${alternateLocale}`}
-            className="inline-flex items-center rounded border border-outline px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-on-surface-variant"
-          >
-            {alternateLocale}
-          </Link>
+          <LocaleSwitch locale={locale} alternate={alternateLocale} />
           <Link href={workspaceHref}>
             <Chip>{workspaceLabel}</Chip>
           </Link>

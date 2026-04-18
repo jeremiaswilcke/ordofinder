@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import type { ModerationQueueItem } from "@/lib/moderation";
 
 type Props = {
@@ -9,20 +10,21 @@ type Props = {
   canDecideApplications: boolean;
 };
 
-const TARGET_LABEL: Record<ModerationQueueItem["targetType"], string> = {
-  church: "Kirche",
-  rating: "Bewertung",
-  application: "Bewerbung",
-};
-
 export function ModerationQueue({
   initialItems,
   currentUserId,
   canDecideApplications,
 }: Props) {
+  const t = useTranslations("moderation");
   const [items, setItems] = React.useState(initialItems);
   const [busyId, setBusyId] = React.useState<string | null>(null);
   const [errors, setErrors] = React.useState<Record<string, string>>({});
+
+  const targetLabel: Record<ModerationQueueItem["targetType"], string> = {
+    church: t("labelChurch"),
+    rating: t("labelRating"),
+    application: t("labelApplication"),
+  };
 
   async function act(
     item: ModerationQueueItem,
@@ -34,14 +36,12 @@ export function ModerationQueue({
     try {
       let res: Response;
       if (item.targetType === "application" && canDecideApplications) {
-        // Tier 1+ entscheidet Bewerbung sofort.
         res = await fetch(`/api/applications/${item.targetId}/decide`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ decision: action }),
         });
       } else {
-        // Alles andere laeuft ueber die 4-Augen-Signaturen.
         res = await fetch(`/api/moderation`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -56,7 +56,6 @@ export function ModerationQueue({
         const body = await res.json().catch(() => ({}));
         throw new Error(body.error ?? `http_${res.status}`);
       }
-      // Optimistisch entfernen (Status wird serverseitig durch Trigger neu berechnet).
       setItems((list) =>
         list.filter(
           (i) =>
@@ -76,7 +75,7 @@ export function ModerationQueue({
   if (items.length === 0) {
     return (
       <p className="rounded-lg bg-surface-container-lowest p-6 text-sm text-on-surface-variant shadow-archival">
-        Aktuell nichts in der Warteschlange.
+        {t("empty")}
       </p>
     );
   }
@@ -98,7 +97,7 @@ export function ModerationQueue({
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <p className="text-[10px] uppercase tracking-[0.2em] text-outline">
-                  {TARGET_LABEL[item.targetType]} · {item.status.replaceAll("_", " ")}
+                  {targetLabel[item.targetType]} · {item.status.replaceAll("_", " ")}
                 </p>
                 <h3 className="mt-1 font-headline text-xl text-primary">
                   {item.title}
@@ -108,7 +107,7 @@ export function ModerationQueue({
                 </p>
                 {item.signatures.length > 0 && (
                   <p className="mt-2 text-xs text-outline">
-                    Bereits signiert von:{" "}
+                    {t("alreadySignedBy")}{" "}
                     {item.signatures
                       .map(
                         (s) =>
@@ -125,7 +124,7 @@ export function ModerationQueue({
                   onClick={() => act(item, "approve")}
                   className="rounded bg-primary px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-on-primary transition hover:bg-primary-dim disabled:opacity-50"
                 >
-                  {busyId === key ? "…" : "Freigeben"}
+                  {busyId === key ? t("working") : t("approve")}
                 </button>
                 <button
                   type="button"
@@ -133,24 +132,22 @@ export function ModerationQueue({
                   onClick={() => act(item, "reject")}
                   className="rounded border border-outline/60 bg-surface px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-on-surface transition hover:border-error hover:text-error disabled:opacity-50"
                 >
-                  Ablehnen
+                  {t("reject")}
                 </button>
               </div>
             </div>
 
             {selfCreated && (
-              <p className="mt-3 text-xs text-outline">
-                Eigener Eintrag — Signatur nicht möglich.
-              </p>
+              <p className="mt-3 text-xs text-outline">{t("ownEntry")}</p>
             )}
             {!selfCreated && alreadySigned && (
               <p className="mt-3 text-xs text-outline">
-                Du hast hier bereits signiert.
+                {t("alreadySignedByYou")}
               </p>
             )}
             {errors[key] && (
               <p className="mt-3 text-xs text-error">
-                Fehler: {errors[key]}
+                {t("errorPrefix")} {errors[key]}
               </p>
             )}
           </article>

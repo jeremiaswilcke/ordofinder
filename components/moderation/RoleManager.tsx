@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import type { ProfileListItem } from "@/lib/moderation";
 import type { UserRole } from "@/lib/auth";
 
@@ -8,14 +9,6 @@ type Props = {
   initialProfiles: ProfileListItem[];
   actorRole: UserRole;
   actorUserId: string;
-};
-
-const ROLE_LABELS: Record<string, string> = {
-  null: "ohne Rolle (Bewerbung offen)",
-  reviewer: "Reviewer (Tier 2)",
-  senior_reviewer: "Senior Reviewer (Tier 1)",
-  regional_admin: "Länder-Admin (Tier 0)",
-  global_admin: "Global Admin",
 };
 
 function allowedTargets(actor: UserRole): UserRole[] {
@@ -36,17 +29,22 @@ export function RoleManager({
   actorRole,
   actorUserId,
 }: Props) {
+  const t = useTranslations("moderation");
   const [profiles, setProfiles] = React.useState(initialProfiles);
   const [busyId, setBusyId] = React.useState<string | null>(null);
   const [errors, setErrors] = React.useState<Record<string, string>>({});
 
   const targetOptions = allowedTargets(actorRole);
 
-  async function setRole(
-    userId: string,
-    newRole: UserRole | null,
-    countryCode?: string
-  ) {
+  const roleLabel: Record<string, string> = {
+    null: t("rolesRoleNull"),
+    reviewer: t("rolesRoleReviewer"),
+    senior_reviewer: t("rolesRoleSenior"),
+    regional_admin: t("rolesRoleRegional"),
+    global_admin: t("rolesRoleGlobal"),
+  };
+
+  async function setRole(userId: string, newRole: UserRole | null) {
     setBusyId(userId);
     setErrors((e) => ({ ...e, [userId]: "" }));
     try {
@@ -56,7 +54,6 @@ export function RoleManager({
         body: JSON.stringify({
           targetUserId: userId,
           newRole,
-          countryCode: countryCode ?? undefined,
         }),
       });
       if (!res.ok) {
@@ -79,7 +76,7 @@ export function RoleManager({
   if (profiles.length === 0) {
     return (
       <p className="rounded-lg bg-surface-container-lowest p-6 text-sm text-on-surface-variant shadow-archival">
-        Keine Profile geladen.
+        {t("rolesEmpty")}
       </p>
     );
   }
@@ -88,7 +85,7 @@ export function RoleManager({
     <div className="space-y-3">
       {profiles.map((p) => {
         const isSelf = p.userId === actorUserId;
-        const currentRoleLabel = ROLE_LABELS[p.role ?? "null"];
+        const currentRoleLabel = roleLabel[p.role ?? "null"];
         return (
           <article
             key={p.userId}
@@ -97,7 +94,7 @@ export function RoleManager({
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <h3 className="font-headline text-lg text-on-surface">
-                  {p.displayName ?? "(ohne Name)"}
+                  {p.displayName ?? t("rolesAnonymous")}
                 </h3>
                 <p className="text-xs text-on-surface-variant">
                   {currentRoleLabel}
@@ -128,7 +125,7 @@ export function RoleManager({
                       onClick={() => setRole(p.userId, null)}
                       className="rounded border border-outline/60 bg-surface px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-on-surface transition hover:border-error hover:text-error disabled:opacity-40"
                     >
-                      Entziehen
+                      {t("rolesRevoke")}
                     </button>
                   )}
                 </div>
@@ -136,13 +133,13 @@ export function RoleManager({
 
               {isSelf && (
                 <span className="text-[10px] uppercase tracking-[0.18em] text-outline">
-                  du selbst
+                  {t("rolesSelf")}
                 </span>
               )}
             </div>
             {errors[p.userId] && (
               <p className="mt-2 text-xs text-error">
-                Fehler: {errors[p.userId]}
+                {t("errorPrefix")} {errors[p.userId]}
               </p>
             )}
           </article>

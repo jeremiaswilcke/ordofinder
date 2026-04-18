@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { getCurrentProfile, isReviewerOrHigher } from "@/lib/auth";
 import { getModerationQueueForCurrentUser } from "@/lib/moderation";
 import { ModerationQueue } from "@/components/moderation/ModerationQueue";
@@ -17,7 +18,10 @@ export default async function ReviewerPage({
     redirect(`/${locale}`);
   }
 
-  const items = await getModerationQueueForCurrentUser(80);
+  const [t, items] = await Promise.all([
+    getTranslations({ locale, namespace: "reviewer" }),
+    getModerationQueueForCurrentUser(80),
+  ]);
 
   const tier1Plus =
     profile.role === "senior_reviewer" ||
@@ -30,36 +34,33 @@ export default async function ReviewerPage({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-[10px] uppercase tracking-[0.2em] text-outline">
-              Reviewer Dashboard
+              {t("eyebrow")}
             </p>
             <h1 className="mt-4 font-headline text-5xl text-primary">
-              Moderations-Warteschlange
+              {t("heading")}
             </h1>
             <p className="mt-4 max-w-2xl text-on-surface-variant">
-              Hier siehst du offene Kirchen, Bewertungen und Bewerbungen.
-              {tier1Plus
-                ? " Als Tier 1+ werden deine Signaturen direkt wirksam."
-                : " Als Tier 2 braucht jede Freigabe eine zweite Signatur."}
+              {tier1Plus ? t("leadTier1") : t("leadTier2")}
             </p>
           </div>
           <form action={signOut}>
             <input type="hidden" name="locale" value={locale} />
             <button className="rounded border border-outline/60 bg-surface px-3 py-2 text-[10px] uppercase tracking-[0.18em] text-on-surface hover:border-primary hover:text-primary">
-              Abmelden
+              {t("signOut")}
             </button>
           </form>
         </div>
       </section>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <Stat label="Offen" value={items.length} />
+        <Stat label={t("statOpen")} value={items.length} />
         <Stat
-          label="Deine Rolle"
+          label={t("statRole")}
           value={profile.role.replace("_", " ")}
           monospace
         />
         <Stat
-          label="Konto"
+          label={t("statAccount")}
           value={profile.displayName ?? profile.email}
           monospace
         />
@@ -67,7 +68,7 @@ export default async function ReviewerPage({
 
       <section className="rounded-lg bg-surface-container-low p-6">
         <p className="text-[10px] uppercase tracking-[0.2em] text-outline">
-          Warteschlange
+          {t("queueTitle")}
         </p>
         <div className="mt-4">
           <ModerationQueue

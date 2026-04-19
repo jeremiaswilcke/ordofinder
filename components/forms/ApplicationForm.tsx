@@ -171,14 +171,19 @@ export function ApplicationForm({
 
       {status === "error" && (
         <p className="text-sm text-error-container">
-          {errorSuffix()}{" "}
-          <a
-            href={`/${locale}/login`}
-            className="text-primary hover:underline"
-          >
-            {t("signInLink")}
-          </a>
-          .
+          {errorSuffix()}
+          {error === "unauthenticated" ? (
+            <>
+              {" "}
+              <a
+                href={`/${locale}/login`}
+                className="text-primary hover:underline"
+              >
+                {t("signInLink")}
+              </a>
+              .
+            </>
+          ) : null}
         </p>
       )}
     </form>

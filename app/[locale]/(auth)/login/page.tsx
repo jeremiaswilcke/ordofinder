@@ -1,4 +1,6 @@
+import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { getCurrentProfile } from "@/lib/auth";
 import {
   signInWithEmail,
   signInWithGoogle,
@@ -25,6 +27,21 @@ export default async function LoginPage({
   const { mode, error, info } = await searchParams;
   const isSignup = mode === "signup";
   const t = await getTranslations({ locale, namespace: "auth" });
+
+  // Bereits eingeloggte Nutzer verlassen die Login-Seite sofort — sonst
+  // entsteht ein Zirkel: Google-OAuth erkennt die Session, leitet zurueck zu
+  // Apply/Reviewer/Admin, Nutzer klickt dort irgendwo "Sign in", landet wieder
+  // hier, klickt Google, Runde von vorne.
+  const existing = await getCurrentProfile();
+  if (existing) {
+    const target =
+      existing.role === "global_admin" || existing.role === "regional_admin"
+        ? `/${locale}/admin`
+        : existing.role === "senior_reviewer" || existing.role === "reviewer"
+          ? `/${locale}/reviewer`
+          : `/${locale}/apply`;
+    redirect(target);
+  }
 
   const errorKey = error ? ERROR_KEY_BY_RAW[error] ?? null : null;
   const errorLabel = errorKey

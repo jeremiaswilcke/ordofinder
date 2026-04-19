@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Icon } from "../ui/Icon";
 
 function SectionTitle({ title, subtitle }: { title: string; subtitle: string }) {
@@ -32,23 +33,29 @@ const initialState = {
   description: "",
 };
 
-const faithChips = [
-  "Daily Adoration",
-  "Gregorian Chant",
-  "Youth Guild",
-  "Frequent Confession",
-  "Strong Catechesis",
-  "Quiet Prayer",
-];
+const FAITH_CHIP_KEYS = [
+  "faithChipDailyAdoration",
+  "faithChipGregorianChant",
+  "faithChipYouthGuild",
+  "faithChipFrequentConfession",
+  "faithChipStrongCatechesis",
+  "faithChipQuietPrayer",
+] as const;
 
 function fieldClassName() {
   return "w-full border-0 border-b-2 border-outline-variant/30 bg-transparent px-0 py-3 font-body text-base text-on-surface placeholder:text-outline-variant/60 focus:border-primary focus:ring-0";
 }
 
 export function SubmissionForm() {
+  const t = useTranslations("submission");
   const [form, setForm] = useState(initialState);
-  const [selectedFaithChips, setSelectedFaithChips] = useState<string[]>(["Daily Adoration", "Gregorian Chant"]);
-  const [status, setStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
+  const [selectedFaithChips, setSelectedFaithChips] = useState<string[]>([
+    "faithChipDailyAdoration",
+    "faithChipGregorianChant",
+  ]);
+  const [status, setStatus] = useState<"idle" | "saving" | "success" | "error">(
+    "idle"
+  );
   const [message, setMessage] = useState("");
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -58,7 +65,9 @@ export function SubmissionForm() {
 
     const payload = {
       ...form,
-      consecrationYear: form.consecrationYear ? Number(form.consecrationYear) : undefined,
+      consecrationYear: form.consecrationYear
+        ? Number(form.consecrationYear)
+        : undefined,
       capacity: form.capacity ? Number(form.capacity) : undefined,
       liturgyQuality: Number(form.liturgyQuality),
       music: Number(form.music),
@@ -79,23 +88,28 @@ export function SubmissionForm() {
       }
 
       setStatus("success");
-      setMessage(data.mode === "local-fallback"
-        ? "Validated locally. Connect Supabase to persist the submission."
-        : "Submission sent to the review queue.");
+      setMessage(
+        data.mode === "local-fallback" ? t("successLocal") : t("successRemote")
+      );
       setForm(initialState);
     } catch (error) {
       setStatus("error");
-      setMessage(error instanceof Error ? error.message : "Submission failed.");
+      setMessage(error instanceof Error ? error.message : t("errorGeneric"));
     }
   }
 
-  function update<K extends keyof typeof initialState>(key: K, value: (typeof initialState)[K]) {
+  function update<K extends keyof typeof initialState>(
+    key: K,
+    value: (typeof initialState)[K]
+  ) {
     setForm((current) => ({ ...current, [key]: value }));
   }
 
-  function toggleFaithChip(value: string) {
+  function toggleFaithChip(key: string) {
     setSelectedFaithChips((current) =>
-      current.includes(value) ? current.filter((item) => item !== value) : [...current, value],
+      current.includes(key)
+        ? current.filter((item) => item !== key)
+        : [...current, key]
     );
   }
 
@@ -103,111 +117,221 @@ export function SubmissionForm() {
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_340px]">
       <form className="space-y-12" onSubmit={handleSubmit}>
         <section>
-          <SectionTitle title="Identity & Location" subtitle="Canonical name, city entry-point and precise coordinates." />
+          <SectionTitle
+            title={t("sectionIdentityTitle")}
+            subtitle={t("sectionIdentitySubtitle")}
+          />
           <div className="space-y-6">
             <div>
-              <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">Church Name</label>
-              <input className={fieldClassName()} placeholder="e.g. Basilica of the Holy Trinity" value={form.churchName} onChange={(event) => update("churchName", event.target.value)} required />
+              <Label>{t("churchName")}</Label>
+              <input
+                className={fieldClassName()}
+                placeholder={t("churchNamePlaceholder")}
+                value={form.churchName}
+                onChange={(e) => update("churchName", e.target.value)}
+                required
+              />
             </div>
             <div className="grid gap-8 md:grid-cols-2">
               <div>
-                <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">Diocese / Jurisdiction</label>
-                <input className={fieldClassName()} placeholder="Archdiocese / Diocese" value={form.diocese} onChange={(event) => update("diocese", event.target.value)} />
+                <Label>{t("diocese")}</Label>
+                <input
+                  className={fieldClassName()}
+                  placeholder={t("diocesePlaceholder")}
+                  value={form.diocese}
+                  onChange={(e) => update("diocese", e.target.value)}
+                />
               </div>
               <div>
-                <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">Year of Consecration</label>
-                <input className={fieldClassName()} placeholder="YYYY" type="number" min={100} max={new Date().getFullYear()} value={form.consecrationYear} onChange={(event) => update("consecrationYear", event.target.value)} />
+                <Label>{t("consecrationYear")}</Label>
+                <input
+                  className={fieldClassName()}
+                  placeholder={t("consecrationYearPlaceholder")}
+                  type="number"
+                  min={100}
+                  max={new Date().getFullYear()}
+                  value={form.consecrationYear}
+                  onChange={(e) => update("consecrationYear", e.target.value)}
+                />
               </div>
             </div>
             <div className="grid gap-8 md:grid-cols-3">
               <div>
-                <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">City</label>
-                <input className={fieldClassName()} placeholder="Vienna" value={form.city} onChange={(event) => update("city", event.target.value)} required />
+                <Label>{t("city")}</Label>
+                <input
+                  className={fieldClassName()}
+                  placeholder={t("cityPlaceholder")}
+                  value={form.city}
+                  onChange={(e) => update("city", e.target.value)}
+                  required
+                />
               </div>
               <div>
-                <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">Country Code</label>
-                <input className={fieldClassName()} placeholder="AT" value={form.countryCode} onChange={(event) => update("countryCode", event.target.value.toUpperCase())} required maxLength={2} />
+                <Label>{t("countryCode")}</Label>
+                <input
+                  className={fieldClassName()}
+                  placeholder={t("countryCodePlaceholder")}
+                  value={form.countryCode}
+                  onChange={(e) =>
+                    update("countryCode", e.target.value.toUpperCase())
+                  }
+                  required
+                  maxLength={2}
+                />
               </div>
               <div>
-                <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">Timezone</label>
-                <input className={fieldClassName()} placeholder="Europe/Vienna" value={form.timezone} onChange={(event) => update("timezone", event.target.value)} required />
+                <Label>{t("timezone")}</Label>
+                <input
+                  className={fieldClassName()}
+                  placeholder={t("timezonePlaceholder")}
+                  value={form.timezone}
+                  onChange={(e) => update("timezone", e.target.value)}
+                  required
+                />
               </div>
             </div>
           </div>
         </section>
 
         <section className="rounded-lg border border-outline-variant/10 bg-surface-container-low p-8">
-          <SectionTitle title="Lebendigkeit des Glaubens" subtitle="Observed rhythm, catechesis, youth presence and communal strength." />
+          <SectionTitle
+            title={t("sectionFaithTitle")}
+            subtitle={t("sectionFaithSubtitle")}
+          />
           <p className="-mt-2 text-sm leading-relaxed text-on-surface-variant">
-            Describe the spiritual energy and parish vitality: liturgical seriousness, youth presence, devotions, confession, adoration and communal life.
+            {t("sectionFaithDescription")}
           </p>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {faithChips.map((chip) => {
-              const active = selectedFaithChips.includes(chip);
+          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {FAITH_CHIP_KEYS.map((key) => {
+              const active = selectedFaithChips.includes(key);
               return (
                 <button
-                  key={chip}
+                  key={key}
                   type="button"
-                  onClick={() => toggleFaithChip(chip)}
+                  onClick={() => toggleFaithChip(key)}
                   className={`flex items-center justify-between rounded border px-4 py-3 text-left transition-colors ${
                     active
                       ? "border-primary/30 bg-primary/5"
                       : "border-outline-variant/20 bg-surface-container-lowest hover:bg-primary/5"
                   }`}
                 >
-                  <span className="text-[10px] uppercase tracking-[0.08em] text-primary">{chip}</span>
-                  <Icon name="check_circle" className={active ? "text-primary" : "text-outline-variant"} />
+                  <span className="text-[10px] uppercase tracking-[0.08em] text-primary">
+                    {t(key)}
+                  </span>
+                  <Icon
+                    name="check_circle"
+                    className={active ? "text-primary" : "text-outline-variant"}
+                  />
                 </button>
               );
             })}
           </div>
           <div className="mt-6 grid gap-6 md:grid-cols-2">
             <div>
-              <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">Liturgy Quality</label>
-              <input className={fieldClassName()} placeholder="1-10" type="number" min={1} max={10} value={form.liturgyQuality} onChange={(event) => update("liturgyQuality", event.target.value)} required />
+              <Label>{t("liturgyQuality")}</Label>
+              <input
+                className={fieldClassName()}
+                placeholder={t("ratingPlaceholder")}
+                type="number"
+                min={1}
+                max={10}
+                value={form.liturgyQuality}
+                onChange={(e) => update("liturgyQuality", e.target.value)}
+                required
+              />
             </div>
             <div>
-              <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">Music</label>
-              <input className={fieldClassName()} placeholder="1-10" type="number" min={1} max={10} value={form.music} onChange={(event) => update("music", event.target.value)} required />
+              <Label>{t("music")}</Label>
+              <input
+                className={fieldClassName()}
+                placeholder={t("ratingPlaceholder")}
+                type="number"
+                min={1}
+                max={10}
+                value={form.music}
+                onChange={(e) => update("music", e.target.value)}
+                required
+              />
             </div>
             <div>
-              <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">Homily Clarity</label>
-              <input className={fieldClassName()} placeholder="1-10" type="number" min={1} max={10} value={form.homilyClarity} onChange={(event) => update("homilyClarity", event.target.value)} required />
+              <Label>{t("homilyClarity")}</Label>
+              <input
+                className={fieldClassName()}
+                placeholder={t("ratingPlaceholder")}
+                type="number"
+                min={1}
+                max={10}
+                value={form.homilyClarity}
+                onChange={(e) => update("homilyClarity", e.target.value)}
+                required
+              />
             </div>
             <div>
-              <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">Vibrancy</label>
-              <input className={fieldClassName()} placeholder="1-10" type="number" min={1} max={10} value={form.vibrancy} onChange={(event) => update("vibrancy", event.target.value)} required />
+              <Label>{t("vibrancy")}</Label>
+              <input
+                className={fieldClassName()}
+                placeholder={t("ratingPlaceholder")}
+                type="number"
+                min={1}
+                max={10}
+                value={form.vibrancy}
+                onChange={(e) => update("vibrancy", e.target.value)}
+                required
+              />
             </div>
           </div>
           <div className="mt-6">
-            <label className="mb-2 block text-[10px] uppercase tracking-[0.2em] text-outline">Parish Life Narrative</label>
+            <Label>{t("shortNote")}</Label>
             <textarea
               className="min-h-32 w-full resize-none rounded-lg border border-outline-variant/20 bg-surface-container-lowest p-4 leading-relaxed placeholder:text-outline-variant/50 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              placeholder="Detail the community activities, prayer life, youth engagement and traditional devotions..."
+              placeholder={t("shortNotePlaceholder")}
               value={form.shortNote}
               maxLength={200}
-              onChange={(event) => update("shortNote", event.target.value)}
+              onChange={(e) => update("shortNote", e.target.value)}
             />
           </div>
         </section>
 
         <section>
-          <SectionTitle title="Architectural Metadata" subtitle="Diocese, capacity, style and a short archival note." />
+          <SectionTitle
+            title={t("sectionArchitectureTitle")}
+            subtitle={t("sectionArchitectureSubtitle")}
+          />
           <div className="grid gap-8 md:grid-cols-2">
             <div>
-              <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">Structural Style</label>
-              <input className={fieldClassName()} placeholder="Romanesque Revival / Gothic / Baroque..." value={form.architecturalStyle} onChange={(event) => update("architecturalStyle", event.target.value)} />
+              <Label>{t("architecturalStyle")}</Label>
+              <input
+                className={fieldClassName()}
+                placeholder={t("architecturalStylePlaceholder")}
+                value={form.architecturalStyle}
+                onChange={(e) => update("architecturalStyle", e.target.value)}
+              />
             </div>
             <div>
-              <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">Capacity (approx.)</label>
-              <input className={fieldClassName()} placeholder="Seats" type="number" min={10} max={50000} value={form.capacity} onChange={(event) => update("capacity", event.target.value)} />
+              <Label>{t("capacity")}</Label>
+              <input
+                className={fieldClassName()}
+                placeholder={t("capacityPlaceholder")}
+                type="number"
+                min={10}
+                max={50000}
+                value={form.capacity}
+                onChange={(e) => update("capacity", e.target.value)}
+              />
             </div>
           </div>
           <div className="mt-6">
-            <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">Editorial Description</label>
-            <textarea className="min-h-40 w-full resize-none rounded-lg border border-outline-variant/20 bg-surface-container-low p-4 leading-relaxed placeholder:text-outline-variant/50 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Provide historical context, architectural character, schedule confidence and the spiritual atmosphere of the church..." maxLength={2000} value={form.description} onChange={(event) => update("description", event.target.value)} />
+            <Label>{t("description")}</Label>
+            <textarea
+              className="min-h-40 w-full resize-none rounded-lg border border-outline-variant/20 bg-surface-container-low p-4 leading-relaxed placeholder:text-outline-variant/50 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              placeholder={t("descriptionPlaceholder")}
+              maxLength={2000}
+              value={form.description}
+              onChange={(e) => update("description", e.target.value)}
+            />
           </div>
         </section>
+
         {message ? (
           <div
             className={`rounded-lg px-4 py-3 text-sm ${
@@ -221,36 +345,44 @@ export function SubmissionForm() {
         ) : null}
 
         <div className="flex flex-wrap items-center justify-between gap-6 border-t border-on-surface pt-8">
-          <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-outline">Review window: typically 7-14 days</p>
+          <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-outline">
+            {t("reviewWindow")}
+          </p>
           <div className="flex flex-wrap items-center gap-4">
-            <button type="button" className="text-[11px] font-semibold uppercase tracking-[0.18em] text-outline transition-colors hover:text-primary">
-              Discard Draft
+            <button
+              type="button"
+              className="text-[11px] font-semibold uppercase tracking-[0.18em] text-outline transition-colors hover:text-primary"
+              onClick={() => setForm(initialState)}
+            >
+              {t("discardDraft")}
             </button>
             <button
               type="submit"
               disabled={status === "saving"}
               className="inline-flex items-center justify-center rounded bg-primary px-8 py-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-on-primary transition-colors hover:bg-primary-dim disabled:opacity-60"
             >
-              {status === "saving" ? "Submitting..." : "Submit to Archive"}
+              {status === "saving" ? t("submitting") : t("submitButton")}
             </button>
           </div>
         </div>
       </form>
       <aside className="h-fit space-y-8 lg:sticky lg:top-24">
         <div className="rounded-xl border border-outline-variant/10 bg-surface-container-high/30 p-8 shadow-archival">
-          <h3 className="border-b border-outline-variant/20 pb-4 font-headline text-lg text-primary">Submission Guidelines</h3>
+          <h3 className="border-b border-outline-variant/20 pb-4 font-headline text-lg text-primary">
+            {t("guidelinesTitle")}
+          </h3>
           <div className="mt-5 space-y-5">
             <div className="flex gap-3">
               <Icon name="verified_user" className="text-primary" />
-              <p className="text-sm text-on-surface-variant">Entries are reviewed for historical accuracy, liturgical plausibility and location fidelity.</p>
+              <p className="text-sm text-on-surface-variant">{t("guideline1")}</p>
             </div>
             <div className="flex gap-3">
               <Icon name="photo_library" className="text-primary" />
-              <p className="text-sm text-on-surface-variant">Include high-resolution facade or interior references once the image workflow is enabled.</p>
+              <p className="text-sm text-on-surface-variant">{t("guideline2")}</p>
             </div>
             <div className="flex gap-3">
               <Icon name="local_library" className="text-primary" />
-              <p className="text-sm text-on-surface-variant">Cite sources for consecration dates and write editorially, not polemically.</p>
+              <p className="text-sm text-on-surface-variant">{t("guideline3")}</p>
             </div>
           </div>
         </div>
@@ -262,10 +394,20 @@ export function SubmissionForm() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 p-6">
-            <p className="font-headline text-2xl leading-snug text-on-primary">Preserving the dignity of sacred spaces.</p>
+            <p className="font-headline text-2xl leading-snug text-on-primary">
+              {t("sidebarCaption")}
+            </p>
           </div>
         </div>
       </aside>
     </div>
+  );
+}
+
+function Label({ children }: { children: React.ReactNode }) {
+  return (
+    <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">
+      {children}
+    </label>
   );
 }

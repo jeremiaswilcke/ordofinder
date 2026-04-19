@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 type InviteCreateFormProps = {
   canSetRole?: boolean;
@@ -10,7 +11,7 @@ type InviteCreateFormProps = {
 
 type FormState = {
   email: string;
-  role: "reviewer" | "regional_admin" | "global_admin";
+  role: "reviewer" | "senior_reviewer" | "regional_admin" | "global_admin";
   countryCode: string;
   subdivisionCode: string;
   isGlobalScope: boolean;
@@ -29,12 +30,15 @@ export function InviteCreateForm({
   defaultCountryCode = "",
   defaultSubdivisionCode = "",
 }: InviteCreateFormProps) {
+  const t = useTranslations("invites");
   const [form, setForm] = useState<FormState>({
     ...initialState,
     countryCode: defaultCountryCode,
     subdivisionCode: defaultSubdivisionCode,
   });
-  const [status, setStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "saving" | "success" | "error">(
+    "idle"
+  );
   const [message, setMessage] = useState("");
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -61,7 +65,13 @@ export function InviteCreateForm({
       }
 
       setStatus("success");
-      setMessage(`Token: ${data.token} · Region: ${data.regionLabel} · Expires: ${new Date(data.expiresAt).toLocaleString("en-GB")}`);
+      setMessage(
+        t("successFormat", {
+          token: data.token,
+          region: data.regionLabel,
+          expires: new Date(data.expiresAt).toLocaleString(),
+        })
+      );
       setForm({
         ...initialState,
         countryCode: defaultCountryCode,
@@ -69,7 +79,7 @@ export function InviteCreateForm({
       });
     } catch (error) {
       setStatus("error");
-      setMessage(error instanceof Error ? error.message : "Invite creation failed.");
+      setMessage(error instanceof Error ? error.message : t("errorGeneric"));
     }
   }
 
@@ -78,21 +88,26 @@ export function InviteCreateForm({
   }
 
   return (
-    <form className="space-y-4 rounded-lg bg-surface-container-low p-6" onSubmit={handleSubmit}>
+    <form
+      className="space-y-4 rounded-lg bg-surface-container-low p-6"
+      onSubmit={handleSubmit}
+    >
       <div className="flex items-center gap-3">
         <span className="h-px w-8 bg-outline-variant" />
         <div>
-          <h2 className="font-headline text-2xl text-primary">Create Invite</h2>
-          <p className="text-sm text-on-surface-variant">Issue a scoped archive invitation for a reviewer or steward.</p>
+          <h2 className="font-headline text-2xl text-primary">
+            {t("createTitle")}
+          </h2>
+          <p className="text-sm text-on-surface-variant">{t("createSubtitle")}</p>
         </div>
       </div>
 
       <input
         className="w-full rounded-lg border-outline-variant bg-surface-container-lowest"
-        placeholder="Invitee email"
+        placeholder={t("emailPlaceholder")}
         type="email"
         value={form.email}
-        onChange={(event) => update("email", event.target.value)}
+        onChange={(e) => update("email", e.target.value)}
         required
       />
 
@@ -100,11 +115,12 @@ export function InviteCreateForm({
         <select
           className="w-full rounded-lg border-outline-variant bg-surface-container-lowest"
           value={form.role}
-          onChange={(event) => update("role", event.target.value as FormState["role"])}
+          onChange={(e) => update("role", e.target.value as FormState["role"])}
         >
-          <option value="reviewer">Reviewer</option>
-          <option value="regional_admin">Regional admin</option>
-          <option value="global_admin">Global admin</option>
+          <option value="reviewer">{t("roleReviewer")}</option>
+          <option value="senior_reviewer">{t("roleSenior")}</option>
+          <option value="regional_admin">{t("roleRegional")}</option>
+          <option value="global_admin">{t("roleGlobal")}</option>
         </select>
       ) : null}
 
@@ -113,9 +129,9 @@ export function InviteCreateForm({
           <input
             type="checkbox"
             checked={form.isGlobalScope}
-            onChange={(event) => update("isGlobalScope", event.target.checked)}
+            onChange={(e) => update("isGlobalScope", e.target.checked)}
           />
-          Global scope
+          {t("globalScope")}
         </label>
       ) : null}
 
@@ -123,17 +139,19 @@ export function InviteCreateForm({
         <div className="grid gap-4 md:grid-cols-2">
           <input
             className="rounded-lg border-outline-variant bg-surface-container-lowest"
-            placeholder="Country code"
+            placeholder={t("countryPlaceholder")}
             value={form.countryCode}
-            onChange={(event) => update("countryCode", event.target.value.toUpperCase())}
+            onChange={(e) => update("countryCode", e.target.value.toUpperCase())}
             maxLength={2}
             required={!form.isGlobalScope}
           />
           <input
             className="rounded-lg border-outline-variant bg-surface-container-lowest"
-            placeholder="Subdivision code"
+            placeholder={t("subdivisionPlaceholder")}
             value={form.subdivisionCode}
-            onChange={(event) => update("subdivisionCode", event.target.value.toUpperCase())}
+            onChange={(e) =>
+              update("subdivisionCode", e.target.value.toUpperCase())
+            }
           />
         </div>
       ) : null}
@@ -155,7 +173,7 @@ export function InviteCreateForm({
         disabled={status === "saving"}
         className="inline-flex w-full items-center justify-center rounded bg-primary px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-on-primary transition-colors hover:bg-primary-dim disabled:opacity-60"
       >
-        {status === "saving" ? "Issuing..." : "Issue Invite"}
+        {status === "saving" ? t("issuing") : t("issue")}
       </button>
     </form>
   );

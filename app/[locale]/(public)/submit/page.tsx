@@ -10,7 +10,10 @@ export default async function SubmitPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "submit" });
+  const [t, intro] = await Promise.all([
+    getTranslations({ locale, namespace: "submit" }),
+    getTranslations({ locale, namespace: "submitPage" }),
+  ]);
 
   // Login + Rolle nur erzwingen, wenn Supabase eingerichtet ist. Im
   // Demo-Modus laesst sich das Formular weiter ohne Login ausprobieren.
@@ -26,7 +29,7 @@ export default async function SubmitPage({
   return (
     <div className="space-y-10">
       <section className="border-b border-on-surface pb-8">
-        <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-outline">Registry Entry</p>
+        <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-outline">{t("eyebrow")}</p>
         <div className="mt-5 grid gap-8 md:grid-cols-[1.5fr_0.9fr] md:items-end">
           <div>
             <h1 className="max-w-3xl font-headline text-5xl font-bold leading-[0.96] text-primary md:text-7xl">
@@ -40,7 +43,7 @@ export default async function SubmitPage({
       </section>
       <div>
         <p className="font-headline text-xl italic text-on-surface-variant">
-          The archive is not kept by editors alone. Every sincere submission deserves careful review.
+          {intro("intro")}
         </p>
       </div>
       <SubmissionForm />

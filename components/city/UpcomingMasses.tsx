@@ -11,7 +11,7 @@ import {
   type UpcomingMass,
 } from "@/lib/upcomingMasses";
 import { haversineDistanceKm, formatDistanceKm } from "@/lib/geo";
-import { formatRatingLabel } from "@/lib/utils";
+import { ratingLabelKey } from "@/lib/utils";
 
 type LocationSource = "user" | "city" | "none";
 type PermissionState = "idle" | "prompting" | "granted" | "denied" | "unsupported";
@@ -227,6 +227,7 @@ function MassRow({
   locale: string;
   t: ReturnType<typeof useTranslations>;
 }) {
+  const ratingsT = useTranslations("ratings");
   const { church, massTime, when } = entry;
   const distance = coords
     ? haversineDistanceKm(coords, {
@@ -277,7 +278,7 @@ function MassRow({
           {rating.toFixed(1)}
         </div>
         <div className="text-[10px] uppercase tracking-[0.18em] text-outline">
-          {formatRatingLabel(rating)}
+          {ratingsT(ratingLabelKey(rating) as never)}
         </div>
       </div>
 

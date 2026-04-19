@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Chip } from "../ui/Chip";
-import { Icon } from "../ui/Icon";
 import { LocaleSwitch } from "./LocaleSwitch";
+import { MobileMenu } from "./MobileMenu";
 import { getCurrentProfile, isReviewerOrHigher } from "@/lib/auth";
 
 const NAV_LINK =
@@ -34,6 +34,15 @@ export async function TopAppBar({ locale }: { locale: string }) {
         ? t("apply")
         : t("login");
 
+  const navItems = [
+    { href: `/${locale}`, label: t("archive") },
+    { href: `/${locale}/cities`, label: t("cities") },
+    { href: `/${locale}/map`, label: t("map") },
+    ...(canContribute
+      ? [{ href: `/${locale}/submit`, label: t("submit") }]
+      : []),
+  ];
+
   return (
     <header className="sticky top-0 z-50 border-b border-outline bg-background/95 backdrop-blur-sm">
       <div className="mx-auto grid max-w-7xl items-center gap-4 px-4 py-4 md:grid-cols-[1fr_auto_1fr] md:px-6">
@@ -49,20 +58,11 @@ export async function TopAppBar({ locale }: { locale: string }) {
           </Link>
         </div>
         <nav className="hidden items-center justify-center gap-7 md:flex">
-          <Link href={`/${locale}`} className={NAV_LINK}>
-            {t("archive")}
-          </Link>
-          <Link href={`/${locale}/cities`} className={NAV_LINK}>
-            {t("cities")}
-          </Link>
-          <Link href={`/${locale}/map`} className={NAV_LINK}>
-            {t("map")}
-          </Link>
-          {canContribute && (
-            <Link href={`/${locale}/submit`} className={NAV_LINK}>
-              {t("submit")}
+          {navItems.map((item) => (
+            <Link key={item.href} href={item.href} className={NAV_LINK}>
+              {item.label}
             </Link>
-          )}
+          ))}
         </nav>
         <div className="hidden items-center justify-end gap-4 md:flex">
           <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-outline">
@@ -73,9 +73,17 @@ export async function TopAppBar({ locale }: { locale: string }) {
             <Chip>{workspaceLabel}</Chip>
           </Link>
         </div>
-        <button className="md:hidden">
-          <Icon name="menu" className="text-primary" />
-        </button>
+
+        <div className="flex justify-end md:hidden">
+          <MobileMenu
+            locale={locale}
+            alternateLocale={alternateLocale}
+            navItems={navItems}
+            workspaceHref={workspaceHref}
+            workspaceLabel={workspaceLabel}
+            edition={landing("edition")}
+          />
+        </div>
       </div>
     </header>
   );

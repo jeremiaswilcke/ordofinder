@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Chip } from "../ui/Chip";
@@ -48,9 +49,14 @@ export async function TopAppBar({ locale }: { locale: string }) {
       <div className="mx-auto grid max-w-7xl items-center gap-4 px-4 py-4 md:grid-cols-[1fr_auto_1fr] md:px-6">
         <div className="flex items-center gap-3">
           <Link href={`/${locale}`} className="flex items-center gap-3">
-            <div className="grid h-6 w-6 place-items-center border border-on-surface text-[13px] font-headline text-on-surface">
-              O
-            </div>
+            <Image
+              src="/logo.png"
+              alt="Ordofinder"
+              width={36}
+              height={36}
+              priority
+              className="rounded-md"
+            />
             <span className="font-headline text-xl text-on-surface">Ordofinder</span>
             <span className="hidden font-mono text-[11px] uppercase tracking-[0.12em] text-outline md:inline-flex">
               Archive

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getCurrentProfile } from "@/lib/auth";
+import { listCountries, listSubdivisions } from "@/lib/catalogs";
 import {
   getModerationQueueForCurrentUser,
   listAllProfiles,
@@ -22,10 +23,12 @@ export default async function AdminPage({
     redirect(`/${locale}`);
   }
 
-  const [t, items, profiles] = await Promise.all([
+  const [t, items, profiles, countries, subdivisions] = await Promise.all([
     getTranslations({ locale, namespace: "admin" }),
     getModerationQueueForCurrentUser(200),
     listAllProfiles(),
+    listCountries(),
+    listSubdivisions(),
   ]);
 
   return (
@@ -103,7 +106,11 @@ export default async function AdminPage({
               {t("accessCodesTitle")}
             </p>
             <div className="mt-4">
-              <AccessCodeCreateForm />
+              <AccessCodeCreateForm
+                actorRole={profile.role}
+                countries={countries}
+                subdivisions={subdivisions}
+              />
             </div>
           </div>
         </aside>

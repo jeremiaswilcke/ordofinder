@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
-import { getCurrentProfile } from "@/lib/auth";
+import { canAssignRole, getCurrentProfile, type UserRole } from "@/lib/auth";
 import { hasSupabaseEnv } from "@/lib/env";
 import { createAccessCode, listAccessCodesCreatedBy } from "@/lib/accessCodes";
 
 const ADMIN_ROLES = new Set(["regional_admin", "global_admin"]);
+const VALID_ROLES = new Set<UserRole>([
+  "reviewer",
+  "senior_reviewer",
+  "regional_admin",
+  "global_admin",
+]);
 
 export async function GET() {
   if (!hasSupabaseEnv()) {
@@ -34,6 +40,13 @@ export async function POST(request: Request) {
   }
 
   const label = typeof body.label === "string" ? body.label.slice(0, 160) : undefined;
+  const requestedRole: UserRole =
+    typeof body.role === "string" && VALID_ROLES.has(body.role as UserRole)
+      ? (body.role as UserRole)
+      : "reviewer";
+  if (!canAssignRole(profile.role, requestedRole)) {
+    return NextResponse.json({ error: "forbidden_role" }, { status: 403 });
+  }
   const countryCode =
     typeof body.countryCode === "string" && body.countryCode.trim()
       ? body.countryCode.trim().toUpperCase().slice(0, 2)
@@ -57,6 +70,7 @@ export async function POST(request: Request) {
     const { plain, record } = await createAccessCode({
       createdBy: profile.userId,
       label,
+      role: requestedRole,
       countryCode,
       subdivisionCode,
       maxUses,

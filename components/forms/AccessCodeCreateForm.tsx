@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Icon } from "../ui/Icon";
+import { canAssignRole, type UserRole } from "@/lib/auth";
+import type { CountryOption, SubdivisionOption } from "@/lib/catalogs";
 
 type CodeRecord = {
   id: string;
@@ -16,9 +18,29 @@ type CodeRecord = {
   created_at: string;
 };
 
-export function AccessCodeCreateForm() {
+type Props = {
+  actorRole: UserRole;
+  countries: CountryOption[];
+  subdivisions: SubdivisionOption[];
+};
+
+const ROLE_OPTIONS: UserRole[] = [
+  "reviewer",
+  "senior_reviewer",
+  "regional_admin",
+  "global_admin",
+];
+
+export function AccessCodeCreateForm({ actorRole, countries, subdivisions }: Props) {
   const t = useTranslations("accessCode");
+
+  const availableRoles = useMemo(
+    () => ROLE_OPTIONS.filter((r) => canAssignRole(actorRole, r)),
+    [actorRole],
+  );
+
   const [label, setLabel] = useState("");
+  const [role, setRole] = useState<UserRole>(availableRoles[0] ?? "reviewer");
   const [countryCode, setCountryCode] = useState("");
   const [subdivisionCode, setSubdivisionCode] = useState("");
   const [maxUses, setMaxUses] = useState("1");
@@ -28,9 +50,23 @@ export function AccessCodeCreateForm() {
   const [lastPlain, setLastPlain] = useState<string | null>(null);
   const [codes, setCodes] = useState<CodeRecord[]>([]);
 
+  const subdivisionsForCountry = useMemo(
+    () =>
+      countryCode
+        ? subdivisions.filter((s) => s.country_code === countryCode)
+        : [],
+    [countryCode, subdivisions],
+  );
+
   useEffect(() => {
     void refreshCodes();
   }, []);
+
+  useEffect(() => {
+    if (subdivisionCode && !subdivisionsForCountry.some((s) => s.code === subdivisionCode)) {
+      setSubdivisionCode("");
+    }
+  }, [subdivisionCode, subdivisionsForCountry]);
 
   async function refreshCodes() {
     try {
@@ -54,6 +90,7 @@ export function AccessCodeCreateForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           label: label || undefined,
+          role,
           countryCode: countryCode || undefined,
           subdivisionCode: subdivisionCode || undefined,
           maxUses: maxUses === "" ? null : Number(maxUses),
@@ -78,9 +115,8 @@ export function AccessCodeCreateForm() {
 
   return (
     <div className="space-y-6">
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <div>
-          <Label>{t("createLabelField")}</Label>
+      <form className="space-y-5" onSubmit={handleSubmit}>
+        <Field label={t("createLabelField")}>
           <input
             className={fieldClass()}
             placeholder={t("createLabelPlaceholder")}
@@ -88,32 +124,62 @@ export function AccessCodeCreateForm() {
             onChange={(e) => setLabel(e.target.value)}
             maxLength={160}
           />
-        </div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <div>
-            <Label>{t("createCountry")}</Label>
-            <input
-              className={fieldClass()}
-              placeholder="AT"
-              value={countryCode}
-              onChange={(e) => setCountryCode(e.target.value.toUpperCase())}
-              maxLength={2}
-            />
-          </div>
-          <div>
-            <Label>{t("createSubdivision")}</Label>
-            <input
-              className={fieldClass()}
-              placeholder="AT-9"
-              value={subdivisionCode}
-              onChange={(e) => setSubdivisionCode(e.target.value.toUpperCase())}
-              maxLength={10}
-            />
-          </div>
-        </div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <div>
-            <Label>{t("createMaxUses")}</Label>
+        </Field>
+
+        <Field label={t("createRole")} hint={t("createRoleHint")}>
+          <select
+            className={fieldClass()}
+            value={role}
+            onChange={(e) => setRole(e.target.value as UserRole)}
+            disabled={availableRoles.length <= 1}
+          >
+            {availableRoles.map((r) => (
+              <option key={r} value={r}>
+                {t(`role_${r}`)}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <Field label={t("createCountry")}>
+          <select
+            className={fieldClass()}
+            value={countryCode}
+            onChange={(e) => setCountryCode(e.target.value)}
+          >
+            <option value="">{t("createCountryAny")}</option>
+            {countries.map((c) => (
+              <option key={c.code} value={c.code}>
+                {c.name} · {c.code}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <Field label={t("createSubdivision")}>
+          <select
+            className={fieldClass()}
+            value={subdivisionCode}
+            onChange={(e) => setSubdivisionCode(e.target.value)}
+            disabled={!countryCode || subdivisionsForCountry.length === 0}
+          >
+            <option value="">
+              {countryCode
+                ? subdivisionsForCountry.length === 0
+                  ? t("createSubdivisionNone")
+                  : t("createSubdivisionAny")
+                : t("createSubdivisionSelectCountry")}
+            </option>
+            {subdivisionsForCountry.map((s) => (
+              <option key={s.code} value={s.code}>
+                {s.name} · {s.code}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label={t("createMaxUses")} hint={t("createMaxUsesHint")}>
             <input
               className={fieldClass()}
               type="number"
@@ -123,17 +189,15 @@ export function AccessCodeCreateForm() {
               onChange={(e) => setMaxUses(e.target.value)}
               placeholder={t("createMaxUsesPlaceholder")}
             />
-            <p className="mt-1 text-[11px] text-on-surface-variant">{t("createMaxUsesHint")}</p>
-          </div>
-          <div>
-            <Label>{t("createExpires")}</Label>
+          </Field>
+          <Field label={t("createExpires")}>
             <input
               className={fieldClass()}
               type="date"
               value={expiresAt}
               onChange={(e) => setExpiresAt(e.target.value)}
             />
-          </div>
+          </Field>
         </div>
 
         {status === "error" && errorMessage ? (
@@ -145,7 +209,7 @@ export function AccessCodeCreateForm() {
         <button
           type="submit"
           disabled={status === "saving"}
-          className="inline-flex items-center justify-center gap-2 rounded bg-primary px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-on-primary transition hover:bg-primary-dim disabled:opacity-60"
+          className="inline-flex w-full items-center justify-center gap-2 rounded bg-primary px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-on-primary transition hover:bg-primary-dim disabled:opacity-60"
         >
           <Icon name="key" />
           {status === "saving" ? t("createSubmitting") : t("createSubmit")}
@@ -154,7 +218,9 @@ export function AccessCodeCreateForm() {
 
       {lastPlain ? (
         <div className="rounded-lg border border-primary/40 bg-primary/5 p-4">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-primary">{t("createResultTitle")}</p>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-primary">
+            {t("createResultTitle")}
+          </p>
           <p className="mt-2 text-sm text-on-surface-variant">{t("createResultHint")}</p>
           <p className="mt-3 break-all font-mono text-2xl font-semibold tracking-[0.2em] text-primary">
             {lastPlain}
@@ -172,7 +238,9 @@ export function AccessCodeCreateForm() {
 
       {codes.length > 0 ? (
         <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-outline">{t("listTitle")}</p>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-outline">
+            {t("listTitle")}
+          </p>
           <div className="mt-3 space-y-2">
             {codes.map((code) => (
               <div
@@ -206,14 +274,26 @@ export function AccessCodeCreateForm() {
   );
 }
 
-function Label({ children }: { children: React.ReactNode }) {
+function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">
+    <div>
+      <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">
+        {label}
+      </label>
       {children}
-    </label>
+      {hint ? <p className="mt-1 text-[11px] text-on-surface-variant">{hint}</p> : null}
+    </div>
   );
 }
 
 function fieldClass() {
-  return "w-full rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-4 py-3 text-sm text-on-surface placeholder:text-outline-variant/60 focus:border-primary focus:outline-none";
+  return "w-full rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-4 py-3 text-sm text-on-surface placeholder:text-outline-variant/60 focus:border-primary focus:outline-none disabled:opacity-50";
 }

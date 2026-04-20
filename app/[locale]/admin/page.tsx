@@ -5,6 +5,7 @@ import {
   getModerationQueueForCurrentUser,
   listAllProfiles,
 } from "@/lib/moderation";
+import { AccessCodeCreateForm } from "@/components/forms/AccessCodeCreateForm";
 import { ModerationQueue } from "@/components/moderation/ModerationQueue";
 import { RoleManager } from "@/components/moderation/RoleManager";
 import { signOut } from "@/app/[locale]/(auth)/login/actions";
@@ -84,16 +85,26 @@ export default async function AdminPage({
             />
           </div>
         </section>
-        <aside className="rounded-lg bg-surface-container-low p-6">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-outline">
-            {t("rolesTitle")}
-          </p>
-          <div className="mt-4">
-            <RoleManager
-              initialProfiles={profiles}
-              actorRole={profile.role}
-              actorUserId={profile.userId}
-            />
+        <aside className="space-y-6">
+          <div className="rounded-lg bg-surface-container-low p-6">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-outline">
+              {t("rolesTitle")}
+            </p>
+            <div className="mt-4">
+              <RoleManager
+                initialProfiles={profiles}
+                actorRole={profile.role}
+                actorUserId={profile.userId}
+              />
+            </div>
+          </div>
+          <div className="rounded-lg bg-surface-container-low p-6">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-outline">
+              {t("accessCodesTitle")}
+            </p>
+            <div className="mt-4">
+              <AccessCodeCreateForm />
+            </div>
           </div>
         </aside>
       </div>

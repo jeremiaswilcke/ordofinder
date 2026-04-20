@@ -119,7 +119,10 @@
     "errorMissingCode": "OAuth-Code fehlt. Bitte erneut versuchen.",
     "errorInvalidCredentials": "E-Mail oder Passwort stimmen nicht. Noch kein Konto? Jetzt anlegen.",
     "errorNotConfirmed": "Bitte bestätige deine E-Mail, dann melde dich an.",
-    "errorAlreadyRegistered": "E-Mail bereits registriert. Melde dich stattdessen an."
+    "errorAlreadyRegistered": "E-Mail bereits registriert. Melde dich stattdessen an.",
+    "accessCode": "Zugangscode (optional)",
+    "accessCodePlaceholder": "XXXX-XXXX-XXXX",
+    "accessCodeHint": "Hast du einen Code von der Redaktion? Einfach eintippen und du wirst bei der Registrierung sofort Tier-1-Reviewer."
   },
   "apply": {
     "eyebrow": "Als Reviewer bewerben",
@@ -169,7 +172,36 @@
     "statAdmins": "Senior / Admin",
     "queueTitle": "Moderations-Warteschlange",
     "rolesTitle": "Rollen verwalten",
+    "accessCodesTitle": "Zugangscodes",
     "signOut": "Abmelden"
+  },
+  "accessCode": {
+    "createLabelField": "Bezeichnung",
+    "createLabelPlaceholder": "z.B. Pfarrei St. Stephan, 2026",
+    "createCountry": "Land (ISO-2)",
+    "createSubdivision": "Region",
+    "createMaxUses": "Max. Einlösungen",
+    "createMaxUsesPlaceholder": "1",
+    "createMaxUsesHint": "Leer lassen für unbegrenzt.",
+    "createExpires": "Gültig bis",
+    "createSubmit": "Code erzeugen",
+    "createSubmitting": "Erzeuge…",
+    "createResultTitle": "Code erstellt — jetzt notieren",
+    "createResultHint": "Der Code wird nur jetzt im Klartext angezeigt. Kopiere ihn und gib ihn an die eingeladene Person weiter.",
+    "createCopy": "Kopieren",
+    "listTitle": "Deine Codes",
+    "listNoLabel": "(keine Bezeichnung)",
+    "listScopeAny": "beliebige Region",
+    "listUsesFormat": "{used}/{max} eingelöst",
+    "listExpires": "gültig bis {date}",
+    "redeemEyebrow": "Tier-1-Zugang",
+    "redeemHeading": "Code einlösen",
+    "redeemLead": "Gib den erhaltenen Code ein, um sofort Reviewer-Zugang freizuschalten.",
+    "redeemCodeLabel": "Zugangscode",
+    "redeemCodePlaceholder": "XXXX-XXXX-XXXX",
+    "redeemSubmit": "Einlösen",
+    "redeemSubmitting": "Einlösen…",
+    "redeemSuccess": "Code eingelöst. Du bist jetzt Reviewer."
   },
   "moderation": {
     "labelChurch": "Kirche",
@@ -308,7 +340,41 @@
     "faithChipYouthGuild": "Jugendgruppe",
     "faithChipFrequentConfession": "Regelmäßige Beichte",
     "faithChipStrongCatechesis": "Starke Katechese",
-    "faithChipQuietPrayer": "Stilles Gebet"
+    "faithChipQuietPrayer": "Stilles Gebet",
+    "sectionScheduleTitle": "Messzeiten",
+    "sectionScheduleSubtitle": "Wöchentlicher Rhythmus der öffentlichen Feiern.",
+    "sectionScheduleDescription": "Trage jede regelmäßige Messe mit Wochentag, Beginnzeit, Sprache, Ritus und Form ein. Auch gelegentliche Feiern (z.B. nur Samstag-Vorabend) gehören hierher. Die Zeiten werden nach Freigabe öffentlich sichtbar.",
+    "massWeekday": "Tag",
+    "massStartTime": "Beginn",
+    "massLanguage": "Sprache",
+    "massRite": "Ritus",
+    "massForm": "Form",
+    "massNotes": "Notiz",
+    "massNotesPlaceholder": "z.B. Vorabendmesse, Hochamt, nur mit Chor",
+    "massAdd": "Messzeit hinzufügen",
+    "massRemove": "Entfernen",
+    "weekday0": "Sonntag",
+    "weekday1": "Montag",
+    "weekday2": "Dienstag",
+    "weekday3": "Mittwoch",
+    "weekday4": "Donnerstag",
+    "weekday5": "Freitag",
+    "weekday6": "Samstag",
+    "rite_roman": "Römisch",
+    "rite_byzantine": "Byzantinisch",
+    "rite_maronite": "Maronitisch",
+    "rite_chaldean": "Chaldäisch",
+    "rite_syro_malabar": "Syro-Malabarisch",
+    "rite_syro_malankara": "Syro-Malankarisch",
+    "rite_coptic_catholic": "Koptisch-katholisch",
+    "rite_ethiopian_catholic": "Äthiopisch-katholisch",
+    "rite_armenian_catholic": "Armenisch-katholisch",
+    "rite_ambrosian": "Ambrosianisch",
+    "rite_mozarabic": "Mozarabisch",
+    "rite_other": "Andere",
+    "form_novus_ordo": "Novus Ordo",
+    "form_tridentine": "Usus Antiquior",
+    "form_not_applicable": "n/a"
   },
   "church": {
     "historicalSanctuary": "Historische Kirche",
@@ -362,7 +428,70 @@
     "navAbout": "Über das Archiv",
     "navEditorial": "Redaktion",
     "navContact": "Kontakt",
-    "navImprint": "Impressum"
+    "navImprint": "Impressum",
+    "navPrivacy": "Datenschutz"
+  },
+  "contact": {
+    "eyebrow": "Haus · Kontakt",
+    "title": "Kontakt",
+    "lead": "Für redaktionelle Anliegen, Löschersuchen oder allgemeine Anfragen bitte direkt per E-Mail.",
+    "editorialLabel": "Redaktion",
+    "editorialBody": "Korrekturen zu Messzeiten, Diözesen oder Kirchendaten sind willkommen. Wir antworten im Rahmen der verfügbaren Zeit; dringende liturgische Fehler werden bevorzugt behandelt."
+  },
+  "imprint": {
+    "eyebrow": "Haus · Impressum",
+    "title": "Impressum",
+    "countryAustria": "Österreich",
+    "contactLabel": "Kontakt",
+    "emailLabel": "E-Mail",
+    "webLabel": "Web",
+    "responsibleLabel": "Verantwortlich für den Inhalt",
+    "responsibleBody": "Jeremias C. Wilcke ist verantwortlich für den redaktionellen Inhalt dieser Seite gemäß § 24 Mediengesetz (MedienG) und § 5 E-Commerce-Gesetz (ECG).",
+    "disclaimerLabel": "Haftung für externe Links",
+    "disclaimerBody": "Trotz sorgfältiger redaktioneller Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links. Für den Inhalt der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich."
+  },
+  "privacy": {
+    "eyebrow": "Haus · Datenschutz",
+    "title": "Datenschutzerklärung",
+    "lead": "Diese Erklärung beschreibt, wie Ordofinder personenbezogene Daten nach der EU-Datenschutz-Grundverordnung (DSGVO) und dem österreichischen Datenschutzgesetz (DSG) verarbeitet.",
+    "controllerAddressHeading": "Verantwortlicher",
+    "controller": {
+      "heading": "Verantwortlicher",
+      "body": "Verantwortlicher im Sinne des Art. 4 Abs. 7 DSGVO ist Jeremias C. Wilcke. Die vollständige Anschrift und Kontaktdaten finden sich am Ende dieser Seite sowie im Impressum."
+    },
+    "processing": {
+      "heading": "Verarbeitungstätigkeiten",
+      "body": "Beim Besuch des Archivs verarbeiten wir die technischen Daten, die dein Browser übermittelt (IP-Adresse, User-Agent, aufgerufene URL, Zeitstempel), um die Seite auszuliefern und den Dienst zu schützen. Bei einer Registrierung kommen E-Mail-Adresse, Anzeigename und Redakteursrolle hinzu. Rechtsgrundlagen: Art. 6 Abs. 1 lit. b und f DSGVO."
+    },
+    "cookies": {
+      "heading": "Cookies und lokale Speicherung",
+      "body": "Wir setzen ausschließlich technisch notwendige Cookies für die Authentifizierung (Supabase-Session) sowie einen LocalStorage-Eintrag für deine Entscheidung im Cookie-Banner. Keine Werbung, kein Tracking, keine Analyse-Cookies. Du kannst deine Zustimmung jederzeit widerrufen, indem du die Seitendaten löschst."
+    },
+    "supabase": {
+      "heading": "Hosting und Datenbank (Supabase)",
+      "body": "Die Anwendung läuft auf Vercel (USA/EU) und nutzt Supabase (EU-Region) für Authentifizierung und die Kirchendatenbank. Mit beiden Anbietern bestehen Auftragsverarbeitungsverträge nach Art. 28 DSGVO."
+    },
+    "rights": {
+      "heading": "Deine Rechte",
+      "body": "Nach der DSGVO hast du das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung und Widerspruch gegen die Verarbeitung deiner Daten sowie das Recht auf Datenübertragbarkeit. Beschwerden kannst du bei der österreichischen Datenschutzbehörde (dsb.gv.at) einreichen."
+    },
+    "retention": {
+      "heading": "Speicherdauer",
+      "body": "Zugriffs-Logs werden maximal 14 Tage vorgehalten. Kontodaten bleiben gespeichert, solange dein Konto besteht; Invite- und Moderationsdaten so lange, wie das redaktionelle Vier-Augen-Prinzip es erfordert."
+    },
+    "contact": {
+      "heading": "Fragen",
+      "body": "Für Fragen zum Datenschutz oder zur Ausübung deiner Rechte schreibe an jeremias@wilckeweb.org. Wir antworten innerhalb der gesetzlichen Frist von einem Monat."
+    }
+  },
+  "cookieBanner": {
+    "ariaLabel": "Cookie-Zustimmung",
+    "eyebrow": "Cookies",
+    "title": "Wir setzen nur, was wirklich nötig ist.",
+    "body": "Ordofinder verwendet ein Session-Cookie für den Login (Supabase) und speichert deine Cookie-Entscheidung lokal. Kein Tracking, keine Werbung. Details in der",
+    "privacyLink": "Datenschutzerklärung",
+    "accept": "Zustimmen",
+    "essentialOnly": "Nur notwendige"
   },
   "invites": {
     "createTitle": "Einladung erstellen",

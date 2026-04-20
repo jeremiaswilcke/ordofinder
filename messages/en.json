@@ -119,7 +119,10 @@
     "errorMissingCode": "OAuth code missing. Please try again.",
     "errorInvalidCredentials": "Email or password is wrong. No account yet? Create one.",
     "errorNotConfirmed": "Please confirm your email, then sign in.",
-    "errorAlreadyRegistered": "Email already registered. Sign in instead."
+    "errorAlreadyRegistered": "Email already registered. Sign in instead.",
+    "accessCode": "Access code (optional)",
+    "accessCodePlaceholder": "XXXX-XXXX-XXXX",
+    "accessCodeHint": "Got a code from the editorial team? Enter it to skip the application and become a Tier 1 reviewer on signup."
   },
   "apply": {
     "eyebrow": "Apply as a reviewer",
@@ -169,7 +172,36 @@
     "statAdmins": "Senior / Admin",
     "queueTitle": "Moderation queue",
     "rolesTitle": "Role management",
+    "accessCodesTitle": "Access codes",
     "signOut": "Sign out"
+  },
+  "accessCode": {
+    "createLabelField": "Label",
+    "createLabelPlaceholder": "e.g. Pfarrei St. Stephan, 2026",
+    "createCountry": "Country (ISO-2)",
+    "createSubdivision": "Subdivision",
+    "createMaxUses": "Max uses",
+    "createMaxUsesPlaceholder": "1",
+    "createMaxUsesHint": "Leave empty for unlimited.",
+    "createExpires": "Expires on",
+    "createSubmit": "Generate code",
+    "createSubmitting": "Generating…",
+    "createResultTitle": "Code created — note it down now",
+    "createResultHint": "This is the only time the plain code will be shown. Copy it and share it with the invitee.",
+    "createCopy": "Copy",
+    "listTitle": "Your codes",
+    "listNoLabel": "(no label)",
+    "listScopeAny": "any region",
+    "listUsesFormat": "{used}/{max} redeemed",
+    "listExpires": "expires {date}",
+    "redeemEyebrow": "Tier-1 access",
+    "redeemHeading": "Redeem access code",
+    "redeemLead": "Paste the code you received to unlock reviewer access immediately.",
+    "redeemCodeLabel": "Access code",
+    "redeemCodePlaceholder": "XXXX-XXXX-XXXX",
+    "redeemSubmit": "Redeem",
+    "redeemSubmitting": "Redeeming…",
+    "redeemSuccess": "Code redeemed. You are now a reviewer."
   },
   "moderation": {
     "labelChurch": "Church",
@@ -308,7 +340,41 @@
     "faithChipYouthGuild": "Youth guild",
     "faithChipFrequentConfession": "Frequent confession",
     "faithChipStrongCatechesis": "Strong catechesis",
-    "faithChipQuietPrayer": "Quiet prayer"
+    "faithChipQuietPrayer": "Quiet prayer",
+    "sectionScheduleTitle": "Mass schedule",
+    "sectionScheduleSubtitle": "Weekly rhythm of public celebrations.",
+    "sectionScheduleDescription": "Add each recurring Mass with weekday, start time, language, rite and form. Occasional celebrations (e.g. Saturday Vigil only) also belong here. Times go into the public schedule once the entry is approved.",
+    "massWeekday": "Weekday",
+    "massStartTime": "Start",
+    "massLanguage": "Lang.",
+    "massRite": "Rite",
+    "massForm": "Form",
+    "massNotes": "Notes",
+    "massNotesPlaceholder": "e.g. Vigil, High Mass, choir only",
+    "massAdd": "Add Mass time",
+    "massRemove": "Remove",
+    "weekday0": "Sunday",
+    "weekday1": "Monday",
+    "weekday2": "Tuesday",
+    "weekday3": "Wednesday",
+    "weekday4": "Thursday",
+    "weekday5": "Friday",
+    "weekday6": "Saturday",
+    "rite_roman": "Roman",
+    "rite_byzantine": "Byzantine",
+    "rite_maronite": "Maronite",
+    "rite_chaldean": "Chaldean",
+    "rite_syro_malabar": "Syro-Malabar",
+    "rite_syro_malankara": "Syro-Malankara",
+    "rite_coptic_catholic": "Coptic Catholic",
+    "rite_ethiopian_catholic": "Ethiopian Catholic",
+    "rite_armenian_catholic": "Armenian Catholic",
+    "rite_ambrosian": "Ambrosian",
+    "rite_mozarabic": "Mozarabic",
+    "rite_other": "Other",
+    "form_novus_ordo": "Novus Ordo",
+    "form_tridentine": "Usus Antiquior",
+    "form_not_applicable": "n/a"
   },
   "church": {
     "historicalSanctuary": "Historical sanctuary",
@@ -362,7 +428,70 @@
     "navAbout": "About the archive",
     "navEditorial": "Editorial desk",
     "navContact": "Contact",
-    "navImprint": "Imprint"
+    "navImprint": "Imprint",
+    "navPrivacy": "Privacy"
+  },
+  "contact": {
+    "eyebrow": "House · Contact",
+    "title": "Contact",
+    "lead": "For editorial questions, takedown requests or general inquiries, please reach out directly.",
+    "editorialLabel": "Editorial desk",
+    "editorialBody": "Corrections to Mass times, dioceses or church data are welcome. We answer as time allows; urgent liturgical errors are prioritised."
+  },
+  "imprint": {
+    "eyebrow": "House · Imprint",
+    "title": "Imprint",
+    "countryAustria": "Austria",
+    "contactLabel": "Contact",
+    "emailLabel": "Email",
+    "webLabel": "Web",
+    "responsibleLabel": "Responsible for content",
+    "responsibleBody": "Jeremias C. Wilcke is responsible for the editorial content of this site in accordance with § 24 Austrian Media Act (MedienG) and § 5 E-Commerce Act (ECG).",
+    "disclaimerLabel": "Liability for external links",
+    "disclaimerBody": "Despite careful editorial control we assume no liability for the content of external links. The operators of linked pages are solely responsible for their own content."
+  },
+  "privacy": {
+    "eyebrow": "House · Privacy",
+    "title": "Privacy Notice",
+    "lead": "This notice explains how Ordofinder handles personal data under the EU General Data Protection Regulation (GDPR) and the Austrian Data Protection Act (DSG).",
+    "controllerAddressHeading": "Controller",
+    "controller": {
+      "heading": "Controller",
+      "body": "The controller within the meaning of Art. 4(7) GDPR is Jeremias C. Wilcke. The full postal address and contact details are listed at the bottom of this page and in the Imprint."
+    },
+    "processing": {
+      "heading": "Processing activities",
+      "body": "When you browse the archive we process the technical data your browser sends (IP address, user agent, requested URL, timestamp) to deliver the page and protect the service. When you create an account we additionally process your email address, display name and reviewer role. Legal basis: Art. 6(1)(b) and (f) GDPR."
+    },
+    "cookies": {
+      "heading": "Cookies and local storage",
+      "body": "We use strictly necessary cookies for authentication (Supabase session) and a local-storage entry to remember your cookie-banner choice. No advertising, tracking or analytics cookies are set. You can withdraw your consent at any time by clearing your site data."
+    },
+    "supabase": {
+      "heading": "Hosting and database (Supabase)",
+      "body": "The application is hosted on Vercel (USA/EU) and uses Supabase (EU region) for authentication and the church database. A data processing agreement under Art. 28 GDPR is in place with both providers."
+    },
+    "rights": {
+      "heading": "Your rights",
+      "body": "Under the GDPR you have the right to access, rectify, erase, restrict or object to the processing of your personal data, and the right to data portability. You may also lodge a complaint with the Austrian Data Protection Authority (dsb.gv.at)."
+    },
+    "retention": {
+      "heading": "Retention",
+      "body": "Access logs are kept for a maximum of 14 days. Account data is retained as long as your account exists; invite and moderation records are kept for as long as needed to operate the editorial four-eyes process."
+    },
+    "contact": {
+      "heading": "Questions",
+      "body": "For any privacy question or to exercise your rights, write to jeremias@wilckeweb.org. We respond within the statutory one-month deadline."
+    }
+  },
+  "cookieBanner": {
+    "ariaLabel": "Cookie consent",
+    "eyebrow": "Cookies",
+    "title": "We only set what's strictly necessary.",
+    "body": "Ordofinder uses a session cookie for login (Supabase) and stores your consent choice locally. No tracking, no advertising. Read the full",
+    "privacyLink": "privacy notice",
+    "accept": "Accept",
+    "essentialOnly": "Essential only"
   },
   "invites": {
     "createTitle": "Create invite",

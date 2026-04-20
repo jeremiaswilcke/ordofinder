@@ -1,11 +1,8 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { SignupPanel } from "@/components/forms/SignupPanel";
 import { getCurrentProfile } from "@/lib/auth";
-import {
-  signInWithEmail,
-  signInWithGoogle,
-  signUpWithEmail,
-} from "./actions";
+import { signInWithEmail, signInWithGoogle } from "./actions";
 
 const ERROR_KEY_BY_RAW: Record<string, string> = {
   supabase_not_configured: "errorSupabase",
@@ -73,73 +70,60 @@ export default async function LoginPage({
         </div>
       )}
 
-      <form action={signInWithGoogle}>
-        <input type="hidden" name="locale" value={locale} />
-        <button className="flex w-full items-center justify-center gap-3 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-5 py-3 text-sm font-semibold text-on-surface transition hover:border-primary hover:text-primary">
-          <GoogleMark />
-          {isSignup ? t("googleSignUp") : t("googleSignIn")}
-        </button>
-      </form>
+      {isSignup ? (
+        <SignupPanel locale={locale} />
+      ) : (
+        <>
+          <form action={signInWithGoogle}>
+            <input type="hidden" name="locale" value={locale} />
+            <button className="flex w-full items-center justify-center gap-3 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-5 py-3 text-sm font-semibold text-on-surface transition hover:border-primary hover:text-primary">
+              <GoogleMark />
+              {t("googleSignIn")}
+            </button>
+          </form>
 
-      <div className="flex items-center gap-3 text-[10px] uppercase tracking-[0.18em] text-outline">
-        <span className="h-px flex-1 bg-outline-variant/40" />
-        {t("orSeparator")}
-        <span className="h-px flex-1 bg-outline-variant/40" />
-      </div>
-
-      <form
-        action={isSignup ? signUpWithEmail : signInWithEmail}
-        className="space-y-4"
-      >
-        <input type="hidden" name="locale" value={locale} />
-
-        {isSignup && (
-          <div>
-            <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">
-              {t("displayName")}
-            </label>
-            <input
-              className="w-full rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-4 py-3"
-              placeholder={t("displayNamePlaceholder")}
-              name="displayName"
-              required
-              minLength={2}
-              maxLength={120}
-            />
+          <div className="flex items-center gap-3 text-[10px] uppercase tracking-[0.18em] text-outline">
+            <span className="h-px flex-1 bg-outline-variant/40" />
+            {t("orSeparator")}
+            <span className="h-px flex-1 bg-outline-variant/40" />
           </div>
-        )}
 
-        <div>
-          <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">
-            {t("email")}
-          </label>
-          <input
-            className="w-full rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-4 py-3"
-            placeholder={t("emailPlaceholder")}
-            name="email"
-            type="email"
-            required
-          />
-        </div>
+          <form action={signInWithEmail} className="space-y-4">
+            <input type="hidden" name="locale" value={locale} />
 
-        <div>
-          <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">
-            {t("password")}
-          </label>
-          <input
-            className="w-full rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-4 py-3"
-            type="password"
-            placeholder={t("passwordPlaceholder")}
-            name="password"
-            required
-            minLength={8}
-          />
-        </div>
+            <div>
+              <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">
+                {t("email")}
+              </label>
+              <input
+                className="w-full rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-4 py-3"
+                placeholder={t("emailPlaceholder")}
+                name="email"
+                type="email"
+                required
+              />
+            </div>
 
-        <button className="w-full rounded bg-primary px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-on-primary transition hover:bg-primary-dim">
-          {isSignup ? t("signUpSubmit") : t("signInSubmit")}
-        </button>
-      </form>
+            <div>
+              <label className="mb-1 block text-[10px] uppercase tracking-[0.2em] text-outline">
+                {t("password")}
+              </label>
+              <input
+                className="w-full rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-4 py-3"
+                type="password"
+                placeholder={t("passwordPlaceholder")}
+                name="password"
+                required
+                minLength={8}
+              />
+            </div>
+
+            <button className="w-full rounded bg-primary px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-on-primary transition hover:bg-primary-dim">
+              {t("signInSubmit")}
+            </button>
+          </form>
+        </>
+      )}
 
       <div className="border-t border-outline-variant/30 pt-6 text-sm text-on-surface-variant">
         {isSignup ? (

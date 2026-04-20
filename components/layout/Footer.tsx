@@ -45,8 +45,9 @@ export async function Footer({ locale }: { locale: string }) {
           <div className="mt-4 grid gap-2 text-sm text-on-surface-variant">
             <Link href={`/${locale}`}>{t("navAbout")}</Link>
             <Link href={`/${locale}/reviewer`}>{t("navEditorial")}</Link>
-            <Link href={`/${locale}/admin`}>{t("navContact")}</Link>
-            <Link href={`/${locale}`}>{t("navImprint")}</Link>
+            <Link href={`/${locale}/contact`}>{t("navContact")}</Link>
+            <Link href={`/${locale}/imprint`}>{t("navImprint")}</Link>
+            <Link href={`/${locale}/privacy`}>{t("navPrivacy")}</Link>
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { redeemAccessCode } from "@/lib/accessCodes";
 import { getCurrentProfile, type UserRole } from "@/lib/auth";
 import { hasSupabaseEnv } from "@/lib/env";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -55,6 +56,7 @@ export async function signUpWithEmail(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const displayName = String(formData.get("displayName") ?? "").trim();
+  const accessCode = String(formData.get("accessCode") ?? "").trim();
   const locale = String(formData.get("locale") ?? "en");
 
   if (!hasSupabaseEnv()) {
@@ -63,19 +65,33 @@ export async function signUpWithEmail(formData: FormData) {
 
   const supabase = await createServerSupabaseClient();
   const origin = await currentOrigin();
+  const nextPath = accessCode
+    ? `/${locale}/redeem?code=${encodeURIComponent(accessCode)}`
+    : `/${locale}/apply`;
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: displayName ? { display_name: displayName } : undefined,
-      emailRedirectTo: `${origin}/auth/callback?next=/${locale}/apply`,
+      emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,
     },
   });
   if (error) {
     redirect(loginUrlWithError(locale, error.message, "signup"));
   }
 
-  // Falls Email-Confirmation aus ist, haben wir sofort eine Session.
+  // Direktes Redeem, wenn wir sofort eine Session haben (Email-Confirm off).
+  // Andernfalls traegt die Callback-Route den Code in die Redeem-Seite.
+  if (data.session && accessCode && data.user?.id) {
+    try {
+      await redeemAccessCode(accessCode, data.user.id);
+      redirect(`/${locale}/reviewer?activated=1`);
+    } catch (redeemError) {
+      const message = redeemError instanceof Error ? redeemError.message : "redeem_failed";
+      redirect(`/${locale}/redeem?code=${encodeURIComponent(accessCode)}&error=${encodeURIComponent(message)}`);
+    }
+  }
+
   if (data.session) {
     redirect(`/${locale}/apply`);
   }
@@ -84,17 +100,22 @@ export async function signUpWithEmail(formData: FormData) {
 
 export async function signInWithGoogle(formData: FormData) {
   const locale = String(formData.get("locale") ?? "en");
+  const accessCode = String(formData.get("accessCode") ?? "").trim();
 
   if (!hasSupabaseEnv()) {
     redirect(loginUrlWithError(locale, "supabase_not_configured"));
   }
+
+  const nextPath = accessCode
+    ? `/${locale}/redeem?code=${encodeURIComponent(accessCode)}`
+    : `/${locale}/apply`;
 
   const supabase = await createServerSupabaseClient();
   const origin = await currentOrigin();
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${origin}/auth/callback?next=/${locale}/apply`,
+      redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(nextPath)}`,
     },
   });
 

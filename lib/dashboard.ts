@@ -33,26 +33,7 @@ export type AdminDashboardData = {
   recentInvites: InviteListItem[];
 };
 
-const mockQueue: ReviewerQueueItem[] = [
-  {
-    id: "sub-vienna-001",
-    name: "Dominikanerkirche",
-    city: "Vienna",
-    countryCode: "AT",
-    status: "pending",
-    submittedAt: "2026-04-18T09:00:00.000Z",
-    region: "AT-9",
-  },
-  {
-    id: "sub-rome-001",
-    name: "San Clemente",
-    city: "Rome",
-    countryCode: "IT",
-    status: "partially_approved",
-    submittedAt: "2026-04-17T14:30:00.000Z",
-    region: "IT-RM",
-  },
-];
+const mockQueue: ReviewerQueueItem[] = [];
 
 export async function getReviewerDashboardData(): Promise<ReviewerDashboardData> {
   if (!hasSupabaseEnv()) {
@@ -178,10 +159,13 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
 }
 
 export function getArchiveOverviewStats() {
+  const churchCount = churches.length;
   return {
     cityCount: new Set(churches.map((church) => church.city)).size,
-    churchCount: churches.length,
+    churchCount,
     averageScore:
-      Math.round((churches.reduce((sum, church) => sum + church.ratings.overall, 0) / churches.length) * 10) / 10,
+      churchCount === 0
+        ? 0
+        : Math.round((churches.reduce((sum, church) => sum + church.ratings.overall, 0) / churchCount) * 10) / 10,
   };
 }

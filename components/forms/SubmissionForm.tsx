@@ -33,6 +33,41 @@ const initialState = {
   description: "",
 };
 
+type MassTimeRow = {
+  weekday: string;
+  startTime: string;
+  languageCode: string;
+  rite: string;
+  form: string;
+  notes: string;
+};
+
+const emptyMassTime: MassTimeRow = {
+  weekday: "0",
+  startTime: "10:00",
+  languageCode: "de",
+  rite: "roman",
+  form: "novus_ordo",
+  notes: "",
+};
+
+const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6] as const;
+const RITES = [
+  "roman",
+  "byzantine",
+  "maronite",
+  "chaldean",
+  "syro_malabar",
+  "syro_malankara",
+  "coptic_catholic",
+  "ethiopian_catholic",
+  "armenian_catholic",
+  "ambrosian",
+  "mozarabic",
+  "other",
+] as const;
+const FORMS = ["novus_ordo", "tridentine", "not_applicable"] as const;
+
 const FAITH_CHIP_KEYS = [
   "faithChipDailyAdoration",
   "faithChipGregorianChant",
@@ -49,6 +84,7 @@ function fieldClassName() {
 export function SubmissionForm() {
   const t = useTranslations("submission");
   const [form, setForm] = useState(initialState);
+  const [massTimes, setMassTimes] = useState<MassTimeRow[]>([{ ...emptyMassTime }]);
   const [selectedFaithChips, setSelectedFaithChips] = useState<string[]>([
     "faithChipDailyAdoration",
     "faithChipGregorianChant",
@@ -73,6 +109,16 @@ export function SubmissionForm() {
       music: Number(form.music),
       homilyClarity: Number(form.homilyClarity),
       vibrancy: Number(form.vibrancy),
+      massTimes: massTimes
+        .filter((row) => row.startTime && row.languageCode)
+        .map((row) => ({
+          weekday: Number(row.weekday),
+          startTime: row.startTime,
+          languageCode: row.languageCode,
+          rite: row.rite,
+          form: row.form,
+          notes: row.notes,
+        })),
     };
 
     try {
@@ -82,9 +128,19 @@ export function SubmissionForm() {
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(data?.error ?? "submission_failed");
+        const detail =
+          typeof data?.details === "string"
+            ? data.details
+            : data?.details
+            ? JSON.stringify(data.details)
+            : "";
+        throw new Error(
+          `${data?.error ?? "submission_failed"} (HTTP ${response.status})${
+            detail ? ` — ${detail}` : ""
+          }`
+        );
       }
 
       setStatus("success");
@@ -92,10 +148,31 @@ export function SubmissionForm() {
         data.mode === "local-fallback" ? t("successLocal") : t("successRemote")
       );
       setForm(initialState);
+      setMassTimes([{ ...emptyMassTime }]);
     } catch (error) {
       setStatus("error");
       setMessage(error instanceof Error ? error.message : t("errorGeneric"));
     }
+  }
+
+  function addMassTime() {
+    setMassTimes((current) => [...current, { ...emptyMassTime }]);
+  }
+
+  function removeMassTime(index: number) {
+    setMassTimes((current) =>
+      current.length <= 1 ? current : current.filter((_, i) => i !== index)
+    );
+  }
+
+  function updateMassTime<K extends keyof MassTimeRow>(
+    index: number,
+    key: K,
+    value: MassTimeRow[K]
+  ) {
+    setMassTimes((current) =>
+      current.map((row, i) => (i === index ? { ...row, [key]: value } : row))
+    );
   }
 
   function update<K extends keyof typeof initialState>(
@@ -329,6 +406,121 @@ export function SubmissionForm() {
               value={form.description}
               onChange={(e) => update("description", e.target.value)}
             />
+          </div>
+        </section>
+
+        <section>
+          <SectionTitle
+            title={t("sectionScheduleTitle")}
+            subtitle={t("sectionScheduleSubtitle")}
+          />
+          <p className="-mt-2 mb-6 text-sm leading-relaxed text-on-surface-variant">
+            {t("sectionScheduleDescription")}
+          </p>
+          <div className="space-y-4">
+            {massTimes.map((row, index) => (
+              <div
+                key={index}
+                className="rounded-lg border border-outline-variant/20 bg-surface-container-lowest p-4"
+              >
+                <div className="grid gap-4 md:grid-cols-[repeat(5,minmax(0,1fr))_auto]">
+                  <div>
+                    <Label>{t("massWeekday")}</Label>
+                    <select
+                      className={fieldClassName()}
+                      value={row.weekday}
+                      onChange={(e) => updateMassTime(index, "weekday", e.target.value)}
+                    >
+                      {WEEKDAYS.map((day) => (
+                        <option key={day} value={day}>
+                          {t(`weekday${day}`)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <Label>{t("massStartTime")}</Label>
+                    <input
+                      className={fieldClassName()}
+                      type="time"
+                      value={row.startTime}
+                      onChange={(e) => updateMassTime(index, "startTime", e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label>{t("massLanguage")}</Label>
+                    <input
+                      className={fieldClassName()}
+                      placeholder="de"
+                      maxLength={8}
+                      value={row.languageCode}
+                      onChange={(e) =>
+                        updateMassTime(index, "languageCode", e.target.value.toLowerCase())
+                      }
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label>{t("massRite")}</Label>
+                    <select
+                      className={fieldClassName()}
+                      value={row.rite}
+                      onChange={(e) => updateMassTime(index, "rite", e.target.value)}
+                    >
+                      {RITES.map((rite) => (
+                        <option key={rite} value={rite}>
+                          {t(`rite_${rite}`)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <Label>{t("massForm")}</Label>
+                    <select
+                      className={fieldClassName()}
+                      value={row.form}
+                      onChange={(e) => updateMassTime(index, "form", e.target.value)}
+                    >
+                      {FORMS.map((f) => (
+                        <option key={f} value={f}>
+                          {t(`form_${f}`)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex items-end">
+                    <button
+                      type="button"
+                      onClick={() => removeMassTime(index)}
+                      disabled={massTimes.length <= 1}
+                      className="inline-flex items-center justify-center rounded border border-outline-variant/30 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-on-surface-variant transition-colors hover:bg-error-container hover:text-on-error-container disabled:opacity-40"
+                      aria-label={t("massRemove")}
+                    >
+                      <Icon name="delete" />
+                    </button>
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <Label>{t("massNotes")}</Label>
+                  <input
+                    className={fieldClassName()}
+                    placeholder={t("massNotesPlaceholder")}
+                    maxLength={200}
+                    value={row.notes}
+                    onChange={(e) => updateMassTime(index, "notes", e.target.value)}
+                  />
+                </div>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={addMassTime}
+              className="inline-flex items-center gap-2 rounded border border-primary/30 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-primary transition-colors hover:bg-primary/5"
+            >
+              <Icon name="add" />
+              {t("massAdd")}
+            </button>
           </div>
         </section>
 

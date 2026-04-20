@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
-import { ArchiveMap } from "@/components/map/ArchiveMap";
+import { ArchiveMap, type MapMarker } from "@/components/map/ArchiveMap";
+import { listChurches } from "@/lib/archive";
 
 export default async function MapPage({
   params,
@@ -7,7 +8,21 @@ export default async function MapPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "mapPage" });
+  const [t, churches] = await Promise.all([
+    getTranslations({ locale, namespace: "mapPage" }),
+    listChurches(),
+  ]);
+
+  const markers: MapMarker[] = churches
+    .filter((c) => Number.isFinite(c.latitude) && Number.isFinite(c.longitude))
+    .map((c) => ({
+      slug: c.slug,
+      name: c.name,
+      city: c.city,
+      latitude: c.latitude,
+      longitude: c.longitude,
+      overall: c.ratings.overall,
+    }));
 
   return (
     <div className="space-y-6">
@@ -22,7 +37,11 @@ export default async function MapPage({
           {t("description")}
         </p>
       </div>
-      <ArchiveMap />
+      <ArchiveMap
+        locale={locale}
+        markers={markers}
+        emptyMessage={t("empty")}
+      />
     </div>
   );
 }

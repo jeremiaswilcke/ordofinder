@@ -415,7 +415,8 @@
   "mapPage": {
     "eyebrow": "Global archive",
     "heading": "Catholic geography, clustered",
-    "description": "Explore the archive through city-centred clusters and church markers — editorial density, not tourism clutter."
+    "description": "Explore the archive through city-centred clusters and church markers — editorial density, not tourism clutter.",
+    "empty": "No entries on the map yet."
   },
   "submitPage": {
     "intro": "The archive is not kept by editors alone. Every sincere submission deserves careful review."

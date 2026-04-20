@@ -1,9 +1,23 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { churches } from "@/lib/demo-data";
 
-export function ArchiveMap() {
+export type MapMarker = {
+  slug: string;
+  name: string;
+  city: string;
+  latitude: number;
+  longitude: number;
+  overall: number;
+};
+
+type Props = {
+  locale: string;
+  markers: MapMarker[];
+  emptyMessage: string;
+};
+
+export function ArchiveMap({ locale, markers, emptyMessage }: Props) {
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -18,23 +32,49 @@ export function ArchiveMap() {
 
       if (cancelled || !ref.current) return;
 
-      const map = L.map(ref.current, { zoomControl: true }).setView([33, 11], 2);
+      const hasMarkers = markers.length > 0;
+      const initialCenter: [number, number] = hasMarkers
+        ? [markers[0].latitude, markers[0].longitude]
+        : [33, 11];
+      const initialZoom = hasMarkers ? 4 : 2;
+
+      const map = L.map(ref.current, { zoomControl: true }).setView(
+        initialCenter,
+        initialZoom,
+      );
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "&copy; OpenStreetMap contributors",
       }).addTo(map);
 
-      const clusterGroup = L.markerClusterGroup();
+      if (hasMarkers) {
+        const clusterGroup = L.markerClusterGroup();
+        const bounds: [number, number][] = [];
 
-      churches.forEach((church) => {
-        const marker = L.marker([church.latitude, church.longitude]);
-        marker.bindPopup(
-          `<div><strong>${church.name}</strong><br/>${church.city}<br/>${church.ratings.overall.toFixed(1)}/10</div>`,
-        );
-        clusterGroup.addLayer(marker);
-      });
+        markers.forEach((marker) => {
+          const m = L.marker([marker.latitude, marker.longitude]);
+          const href = `/${locale}/church/${marker.slug}`;
+          const scoreLine =
+            marker.overall > 0
+              ? `<br/>${marker.overall.toFixed(1)}/10`
+              : "";
+          m.bindPopup(
+            `<div>
+              <strong>${escapeHtml(marker.name)}</strong><br/>
+              ${escapeHtml(marker.city)}${scoreLine}<br/>
+              <a href="${href}" style="color:#3b4a5e;text-decoration:underline">Open</a>
+            </div>`,
+          );
+          clusterGroup.addLayer(m);
+          bounds.push([marker.latitude, marker.longitude]);
+        });
 
-      map.addLayer(clusterGroup);
+        map.addLayer(clusterGroup);
+        if (bounds.length > 1) {
+          map.fitBounds(bounds, { padding: [40, 40], maxZoom: 10 });
+        }
+      }
+
       mapInstance = map;
     }
 
@@ -44,7 +84,27 @@ export function ArchiveMap() {
       cancelled = true;
       mapInstance?.remove();
     };
-  }, []);
+  }, [locale, markers]);
 
-  return <div ref={ref} className="h-[70vh] overflow-hidden rounded-xl border border-outline-variant/40" />;
+  return (
+    <div className="relative h-[70vh] overflow-hidden rounded-xl border border-outline-variant/40">
+      <div ref={ref} className="h-full w-full" />
+      {markers.length === 0 ? (
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="pointer-events-auto rounded-lg border border-outline-variant/40 bg-surface-container-lowest/90 px-6 py-4 text-center shadow-archival backdrop-blur-sm">
+            <p className="font-headline text-lg text-on-surface">{emptyMessage}</p>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function escapeHtml(s: string) {
+  return s
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }

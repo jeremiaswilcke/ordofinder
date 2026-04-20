@@ -415,7 +415,8 @@
   "mapPage": {
     "eyebrow": "Globales Archiv",
     "heading": "Katholische Geografie, gebündelt",
-    "description": "Durchsuche das Archiv über stadt-zentrierte Cluster und Kirchen-Marker — redaktionelle Dichte statt Tourismus-Rauschen."
+    "description": "Durchsuche das Archiv über stadt-zentrierte Cluster und Kirchen-Marker — redaktionelle Dichte statt Tourismus-Rauschen.",
+    "empty": "Noch keine Einträge auf der Karte."
   },
   "submitPage": {
     "intro": "Das Archiv wird nicht von Redakteuren allein getragen. Jede aufrichtige Einreichung verdient sorgfältige Prüfung."
